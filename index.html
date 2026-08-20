@@ -26,15 +26,16 @@ img{display:block;width:100%;height:auto}
 
 .site-header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
 .header-inner{height:58px;padding:0 var(--pad);display:flex;align-items:center;justify-content:space-between;gap:20px}
-.wordmark{font-size:26px;font-weight:700;line-height:1;letter-spacing:-.03em}
+.wordmark{display:inline-flex;align-items:center;line-height:0}
+.wordmark img{display:block;width:clamp(138px,12vw,188px);height:auto}
 .nav{display:flex;gap:clamp(16px,2.5vw,38px);font-size:19px;line-height:1}
 .nav a{position:relative}
 .nav a::after{content:"";position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:#111;transition:right .18s ease}
 .nav a:hover::after{right:0}
 
 .hero{padding:var(--gap) var(--pad) 0;display:grid;grid-template-columns:2fr 5fr 5fr;gap:var(--gap);align-items:start;border-bottom:1px solid var(--line)}
-.hero-brand{background:#050505;color:#fff;align-self:stretch;min-height:100%;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
-.hero-brand h1{margin:0;padding:18px 0;font-size:clamp(82px,8.1vw,150px);font-weight:700;line-height:.72;letter-spacing:-.075em;white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg)}
+.hero-brand{background:#050505;align-self:stretch;min-height:100%;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;padding:22px 14px}
+.hero-brand img{width:min(92%,220px);height:auto;object-fit:contain}
 .hero figure{margin:0;overflow:hidden;background:#f4f4f1}
 .hero img{aspect-ratio:4/5;object-fit:contain;background:#fff}
 
@@ -68,10 +69,11 @@ img{display:block;width:100%;height:auto}
 footer{border-top:1px solid var(--line);padding:20px var(--pad) 26px;display:grid;grid-template-columns:1fr auto 1fr;gap:14px;font-size:17px}
 footer span:nth-child(2){justify-self:center}
 footer span:last-child{justify-self:end}
+.footer-brand{display:flex;align-items:center;gap:7px;min-width:0}
+.footer-brand img{width:105px;height:auto}
 
 @media(max-width:900px){
   .hero{grid-template-columns:1.6fr 5.2fr 5.2fr}
-  .hero-brand h1{font-size:clamp(68px,9vw,105px)}
   .category-strip{grid-template-columns:repeat(2,1fr)}
   .category-strip a:nth-child(2){border-right:0}
   .category-strip a:nth-child(-n+2){border-bottom:1px solid var(--line)}
@@ -83,12 +85,12 @@ footer span:last-child{justify-self:end}
 
 @media(max-width:680px){
   .header-inner{height:54px}
-  .wordmark{font-size:23px}
+  .wordmark img{width:138px}
   .nav{font-size:17px;gap:16px}
   .nav a:first-child{display:none}
   .hero{grid-template-columns:1fr 1fr;padding-left:0;padding-right:0;gap:1px;background:#111}
-  .hero-brand{grid-column:1/3;min-height:118px;justify-content:flex-start;align-items:center;padding:0 var(--pad)}
-  .hero-brand h1{writing-mode:horizontal-tb;transform:none;padding:0;font-size:clamp(74px,22vw,128px);line-height:.7;white-space:nowrap}
+  .hero-brand{grid-column:1/3;min-height:118px;justify-content:flex-start;align-items:center;padding:22px var(--pad)}
+  .hero-brand img{width:min(76vw,360px)}
   .hero figure{background:#fff}
   .category-strip{margin-bottom:90px}
   .category-strip a{padding:15px 14px 17px;font-size:25px}
@@ -106,6 +108,8 @@ footer span:last-child{justify-self:end}
   footer{grid-template-columns:1fr 1fr}
   footer span:nth-child(2){display:none}
   footer span:last-child{justify-self:end}
+.footer-brand{display:flex;align-items:center;gap:7px;min-width:0}
+.footer-brand img{width:105px;height:auto}
 }
 
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.frame img,.nav a::after{transition:none}}
@@ -114,7 +118,7 @@ footer span:last-child{justify-self:end}
 <body>
 <header class="site-header">
   <div class="header-inner">
-    <a class="wordmark" href="#top">JAF Visuals</a>
+    <a class="wordmark" href="#top" aria-label="JAF Visuals home"><img src="assets/images/brand/jaf-visuals-dark.png" alt="JAF Visuals"></a>
     <nav class="nav" aria-label="Primary navigation">
       <a href="#fashion">Work</a>
       <a href="#about">About</a>
@@ -125,7 +129,7 @@ footer span:last-child{justify-self:end}
 
 <main id="top">
 <section class="hero" aria-label="Featured fashion work">
-  <div class="hero-brand"><h1>JAF VISUALS</h1></div>
+  <div class="hero-brand"><img src="assets/images/brand/jaf-visuals-light.png" alt="JAF Visuals"></div>
   <figure><img src="assets/images/fashion/aaliyah-b-day-finals-2.jpg" alt="Fashion editorial portrait by JAF Visuals" fetchpriority="high"></figure>
   <figure><img src="assets/images/fashion/alazar-s-cowboy-fit-close-up-portriats-5.jpg" alt="Fashion portrait by JAF Visuals" fetchpriority="high"></figure>
 </section>
@@ -231,7 +235,7 @@ footer span:last-child{justify-self:end}
 </main>
 
 <footer>
-  <span>© 2026 JAF Visuals</span>
+  <span class="footer-brand"><span aria-hidden="true">© 2026</span><img src="assets/images/brand/jaf-visuals-dark.png" alt="JAF Visuals"></span>
   <span>Photography</span>
   <span>Columbus, Ohio</span>
 </footer>
