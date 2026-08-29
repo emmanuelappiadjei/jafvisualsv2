@@ -69,17 +69,24 @@ share no state, each submission mints a reference code (e.g. `JAF-84V5C`) that
 appears in your notification email *and* is pre-filled into the Calendly booking
 notes, so a brief can be matched to the slot it belongs to.
 
-### What you need to fill in
+### Already connected
 
-Four values in the `BOOKING_CONFIG` block at the top of the last `<script>` in
-`index.html`. Nothing else needs editing.
+`BOOKING_CONFIG` at the top of the last `<script>` in `index.html` is filled
+in and live — the EmailJS account, both templates and the Calendly link are
+all wired up. Nothing to paste.
+
+Those ids are public by design: they ship in the page for the browser to use.
+They can't read your account or send anything the two templates don't already
+permit. The one thing they don't cover is a domain allowlist — that's capped
+on EmailJS's free plan, so the key isn't pinned to this site. See "If mail
+stops arriving" below.
 
 ```js
 const BOOKING_CONFIG = {
-  emailjsPublicKey:      'PASTE-YOUR-EMAILJS-PUBLIC-KEY-HERE',
-  emailjsServiceId:      'PASTE-YOUR-EMAILJS-SERVICE-ID-HERE',
-  emailjsNotifyTemplate: 'PASTE-NOTIFICATION-TEMPLATE-ID',
-  emailjsReplyTemplate:  'PASTE-AUTO-REPLY-TEMPLATE-ID',
+  emailjsPublicKey:      '1-uB0BPT4IGXOhuSU',
+  emailjsServiceId:      'service_m3ctnna',
+  emailjsNotifyTemplate: 'template_9w638jz',   // to the studio
+  emailjsReplyTemplate:  'template_72hr605',   // to the client
   calendlyUrl:           'https://calendly.com/mtanner877/photo-session',
   ...
 };
@@ -151,6 +158,18 @@ automatically, no code edit needed:
 
 Only change `calendlyUrl` if you rename the event or move bookings to a
 different Calendly account.
+
+### If mail stops arriving
+
+EmailJS free allows 200 requests a month and each booking spends 2, so the cap
+is roughly 100 bookings. Worth a look at the usage figure in the EmailJS
+dashboard now and then.
+
+Because the free plan caps the domain allowlist, the public key isn't pinned
+to this site. Nobody is likely to bother digging it out of the page source,
+but if sends ever climb without matching bookings, regenerate the public key
+in **Account → General** and paste the new one into `BOOKING_CONFIG`. That
+instantly invalidates the old one.
 
 ### Free tier limits
 

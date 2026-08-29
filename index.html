@@ -437,19 +437,22 @@ body.lightbox-open{overflow:hidden}
 </script>
 <script>
 /* ============================================================
-   BOOKING — configuration.  Fill in the five PASTE-... values.
-   Full walkthrough in README.md → "Booking form setup".
+   BOOKING — configuration.  Already live; nothing to fill in.
 
-   Note: no email addresses live in this file. Who gets notified is set
-   on the EmailJS template itself, so your inboxes stay out of this
-   public repo.
+   These EmailJS ids and the Calendly link are public by design — they ship
+   in the page for the browser to use, and none of them can read your data
+   or send anything the templates don't already allow.
+
+   No email addresses live in this file. Who gets notified is set on the
+   EmailJS template itself, so your inboxes stay out of this public repo.
+   Full walkthrough in README.md → "Booking form setup".
    ============================================================ */
 const BOOKING_CONFIG = {
   // --- EmailJS (https://dashboard.emailjs.com) ---------------------------
-  emailjsPublicKey: 'PASTE-YOUR-EMAILJS-PUBLIC-KEY-HERE',   // Account → General
-  emailjsServiceId: 'PASTE-YOUR-EMAILJS-SERVICE-ID-HERE',   // Email Services
-  emailjsNotifyTemplate: 'PASTE-NOTIFICATION-TEMPLATE-ID',  // template 1 → to you + your friend
-  emailjsReplyTemplate:  'PASTE-AUTO-REPLY-TEMPLATE-ID',    // template 2 → to whoever filled the form
+  emailjsPublicKey: '1-uB0BPT4IGXOhuSU',   // Account → General
+  emailjsServiceId: 'service_m3ctnna',   // Email Services
+  emailjsNotifyTemplate: 'template_9w638jz',  // template 1 → to you + your friend
+  emailjsReplyTemplate:  'template_72hr605',    // template 2 → to whoever filled the form
 
   // Optional. Leave empty and the notification goes wherever the template's
   // "To Email" says. Only fill this if you'd rather drive recipients from
