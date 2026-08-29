@@ -43,8 +43,8 @@ server or install needed.
 - **About photo** — replace `assets/images/about-placeholder.jpg` with an
   actual headshot (keep the same filename, or update the `src` in
   `index.html` if you rename it).
-- **Booking form** — paste your Web3Forms key and Cal.com link into
-  `BOOKING_CONFIG` in `index.html` (see "Booking form setup" below).
+- **Booking form** — paste your EmailJS keys into `BOOKING_CONFIG` in
+  `index.html`. The Calendly link is already set (see "Booking form setup").
 - **Instagram link** — currently a dead `#` link in the About section and
   nowhere else; add the real URL.
 
@@ -54,76 +54,149 @@ The booking section (`#booking`, near the bottom of `index.html`) is a
 two-step flow:
 
 1. **The brief** — a custom form (name, phone, email, shoot type, shoot
-   description) that POSTs to **Web3Forms**, which emails the enquiry to you.
-2. **Pick a time** — an inline **Cal.com** embed showing your real
-   availability. Open slots are selectable; anything already booked is greyed
-   out, because Cal.com reads your connected calendar.
+   description) that sends through **EmailJS**.
+2. **Pick a time** — an inline **Calendly** embed showing your real
+   availability. Open slots are selectable; anything already booked disappears,
+   because Calendly reads your connected calendar.
 
-They're deliberately two separate services: Web3Forms handles "tell us about
-the shoot," Cal.com owns the calendar and prevents double-booking. To tie the
-two together, each submission generates a reference code (e.g. `JAF-84V5C`)
-that appears in your notification email *and* is pre-filled into the Cal.com
-booking notes.
+One submission sends **two** emails via EmailJS:
 
-### What you need to fill in
+- a **new booking notification** to you and your friend, and
+- a **custom auto-reply** to whoever filled the form.
 
-Both values live in one `BOOKING_CONFIG` block at the top of the last
-`<script>` in `index.html`. Nothing else needs editing.
+Calendly owns the calendar and prevents double-booking. Since the two services
+share no state, each submission mints a reference code (e.g. `JAF-84V5C`) that
+appears in your notification email *and* is pre-filled into the Calendly booking
+notes, so a brief can be matched to the slot it belongs to.
+
+### Already connected
+
+`BOOKING_CONFIG` at the top of the last `<script>` in `index.html` is filled
+in and live — the EmailJS account, both templates and the Calendly link are
+all wired up. Nothing to paste.
+
+Those ids are public by design: they ship in the page for the browser to use.
+They can't read your account or send anything the two templates don't already
+permit. The one thing they don't cover is a domain allowlist — that's capped
+on EmailJS's free plan, so the key isn't pinned to this site. See "If mail
+stops arriving" below.
 
 ```js
 const BOOKING_CONFIG = {
-  web3formsAccessKey: 'PASTE-YOUR-WEB3FORMS-ACCESS-KEY-HERE',
-  calLink: 'PASTE-YOUR-CAL-COM-LINK-HERE',
+  emailjsPublicKey:      '1-uB0BPT4IGXOhuSU',
+  emailjsServiceId:      'service_m3ctnna',
+  emailjsNotifyTemplate: 'template_9w638jz',   // to the studio
+  emailjsReplyTemplate:  'template_72hr605',   // to the client
+  calendlyUrl:           'https://calendly.com/mtanner877/photo-session',
   ...
 };
 ```
 
-**1. Web3Forms access key** — go to [web3forms.com](https://web3forms.com),
-enter your email, and copy the key it sends you. Paste it as
-`web3formsAccessKey`. Free plan: 250 submissions/month.
+**No email addresses go in this file.** Who gets notified is set on the EmailJS
+template itself, which keeps your inboxes out of this public repo.
 
-**2. Getting BOTH of you emailed** — in the Web3Forms dashboard, add your
-friend's address under **Linked Emails**. The free plan carries 3 addresses
-(1 primary + 2 linked), so you're both notified on every submission at no
-cost. Don't use the `ccemail` field for this — that one is PRO-only.
+### EmailJS setup (free)
 
-**3. Cal.com link** — create the event type at
-[cal.com](https://cal.com) and connect your Google Calendar so booked time
-is blocked out automatically. Then take the URL *without* the domain: a page
-at `https://cal.com/jafvisuals/photo-session` becomes
-`'jafvisuals/photo-session'`.
+1. Sign up at [emailjs.com](https://www.emailjs.com) and connect the Gmail
+   account you want mail to send from (**Email Services** → Add New Service).
+   Copy the **Service ID**.
+2. **Account → General**: copy the **Public Key**.
+3. **Email Templates** → create *two* templates. The free plan allows exactly
+   two, which is what this needs.
 
-Set your working hours, session length, and buffer time on the Cal.com event
-— that's what drives the visible open/booked blocks. Nothing about
-availability is stored in this repo.
+**Template 1 — the notification (to you and your friend).**
+Set **To Email** to both addresses separated by a comma:
 
-### Emails: who gets what
+```
+you@example.com, yourfriend@example.com
+```
 
-| Trigger | Who it goes to | Cost |
-|---|---|---|
-| Form submitted | You + your friend (Web3Forms linked emails) | Free |
-| Time slot booked | The client, plus you — Cal.com confirmation + calendar invite | Free |
-| Branded auto-reply the instant the form is sent | The client | **Web3Forms PRO** |
+Subject and body can use any of these variables:
+`{{reference}}` `{{name}}` `{{phone}}` `{{email}}` `{{shoot_type}}`
+`{{description}}` `{{submitted}}`. Set **Reply To** to `{{email}}` so hitting
+reply goes straight to the client. Copy the **Template ID**.
 
-The client already gets a confirmation email from Cal.com when they book a
-slot, so the free setup covers them. If you specifically want your own
-branded auto-reply to fire on *form submit* (before they've picked a time),
-that's the Web3Forms **autoresponder**, which needs their PRO plan
-(~$12/month billed yearly). Nothing in the code changes — you enable it in
-the Web3Forms dashboard, and it keys off the `email` field the form already
-sends.
+> If a test shows only the first address receiving mail, your provider isn't
+> splitting the comma list. Fix it without touching the template: set **To
+> Email** to `{{notify_email}}` and list the addresses in `notifyEmails` in
+> `BOOKING_CONFIG`. The code then sends one notification per address — at the
+> cost of an extra request each, and those addresses become public in this repo.
+
+**Template 2 — the auto-reply (to the client).**
+Set **To Email** to `{{email}}`. This is the branded email the client gets the
+moment they submit — write it in HTML with your wording and the JAF wordmark.
+The same variables are available, so you can echo their brief back to them and
+quote `{{reference}}`. Copy the **Template ID**.
+
+You do *not* need EmailJS's "Auto-Reply" tab — the code sends both templates
+explicitly, which keeps the two emails independent.
+
+**4. Lock it down.** The public key is visible in the page source (unavoidable
+for any no-backend form, and true of every alternative too). In **Account →
+Security**, turn on the domain allowlist and add your live domain so the key
+can't be reused from anywhere else.
+
+### Calendly setup — already done
+
+The booking page is live at
+**https://calendly.com/mtanner877/photo-session** (90 minutes, Columbus area),
+and `calendlyUrl` in `index.html` already points at it. Nothing to paste.
+
+Things you may want to change, all in Calendly itself — the site picks them up
+automatically, no code edit needed:
+
+- **Your hours.** Availability defaults to 9:00–17:00 every day, Sunday
+  included. Set your real shooting hours under **Availability**.
+- **Connect your Google Calendar** so anything already in your diary blocks
+  those slots off. Until you do, Calendly only knows about Calendly bookings.
+- **Session length** is 90 minutes. Change it on the event type if your shoots
+  run longer or shorter.
+- **Your link name.** The URL says `mtanner877` because that's the account
+  username. Changing it to something like `jafvisuals` under **Account →
+  Link** makes the booking page look like yours — if you do, update
+  `calendlyUrl` in `index.html` to match, or the calendar will 404.
+
+Only change `calendlyUrl` if you rename the event or move bookings to a
+different Calendly account.
+
+### If mail stops arriving
+
+EmailJS free allows 200 requests a month and each booking spends 2, so the cap
+is roughly 100 bookings. Worth a look at the usage figure in the EmailJS
+dashboard now and then.
+
+Because the free plan caps the domain allowlist, the public key isn't pinned
+to this site. Nobody is likely to bother digging it out of the page source,
+but if sends ever climb without matching bookings, regenerate the public key
+in **Account → General** and paste the new one into `BOOKING_CONFIG`. That
+instantly invalidates the old one.
+
+### Free tier limits
+
+EmailJS free allows **200 requests/month** and 2 templates. Each booking costs
+2 requests (notification + auto-reply), so that's **~100 bookings/month**. If
+you use the `notifyEmails` fallback above with two addresses, each booking
+costs 3 requests instead (~66/month).
+
+Calendly's free plan allows **one** event type and unlimited bookings, which
+is exactly what this uses. Calendly's own confirmation email to the client is
+free and separate from the EmailJS auto-reply.
 
 ### Notes
 
-- The Cal.com script is **lazy-loaded** — it only downloads when a visitor
-  scrolls near the booking section, so browsing the portfolio stays as
-  dependency-free as the rest of the site.
-- Until you paste the two values in, the form and calendar show a polite
-  "not connected yet" message instead of failing silently.
-- The form validates client-side and has a hidden `botcheck` honeypot field
-  for spam.
-- Reply-to on your notification email is set to the client's address, so
-  hitting reply goes straight to them.
+- Both third-party scripts (EmailJS and Calendly) are **lazy-loaded** — they
+  only download when a visitor scrolls near the booking section, so browsing
+  the portfolio stays as dependency-free as the rest of the site.
+- If Calendly fails to load, the section shows a fallback message pointing at
+  your email rather than an empty box.
+- Until the values are pasted in, the form and calendar show a "not connected
+  yet" message rather than failing silently.
+- The auto-reply is sent *after* the notification and is non-fatal: if the
+  client's confirmation fails, you still get the enquiry.
+- The confirmation screen only appears once the notification has genuinely
+  sent, so a failure can never look like a success.
+- The form validates client-side and has a hidden `botcheck` honeypot; a
+  tripped honeypot shows the normal confirmation but sends nothing.
 
 ## Adding, removing, or swapping photos
 
