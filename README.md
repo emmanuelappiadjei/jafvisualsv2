@@ -55,23 +55,23 @@ two-step flow:
 
 1. **The brief** — a custom form (name, phone, email, shoot type, shoot
    description) that sends through **EmailJS**.
-2. **Pick a time** — an inline **Cal.com** embed showing your real
-   availability. Open slots are selectable; anything already booked is greyed
-   out, because Cal.com reads your connected calendar.
+2. **Pick a time** — an inline **Calendly** embed showing your real
+   availability. Open slots are selectable; anything already booked disappears,
+   because Calendly reads your connected calendar.
 
 One submission sends **two** emails via EmailJS:
 
 - a **new booking notification** to you and your friend, and
 - a **custom auto-reply** to whoever filled the form.
 
-Cal.com owns the calendar and prevents double-booking. Since the two services
+Calendly owns the calendar and prevents double-booking. Since the two services
 share no state, each submission mints a reference code (e.g. `JAF-84V5C`) that
-appears in your notification email *and* is pre-filled into the Cal.com booking
+appears in your notification email *and* is pre-filled into the Calendly booking
 notes, so a brief can be matched to the slot it belongs to.
 
 ### What you need to fill in
 
-Five values in the `BOOKING_CONFIG` block at the top of the last `<script>` in
+Four values in the `BOOKING_CONFIG` block at the top of the last `<script>` in
 `index.html`. Nothing else needs editing.
 
 ```js
@@ -80,7 +80,7 @@ const BOOKING_CONFIG = {
   emailjsServiceId:      'PASTE-YOUR-EMAILJS-SERVICE-ID-HERE',
   emailjsNotifyTemplate: 'PASTE-NOTIFICATION-TEMPLATE-ID',
   emailjsReplyTemplate:  'PASTE-AUTO-REPLY-TEMPLATE-ID',
-  calLink:               'PASTE-YOUR-CAL-COM-LINK-HERE',
+  calendlyUrl:           'https://calendly.com/mtanner877/photo-session',
   ...
 };
 ```
@@ -129,16 +129,28 @@ for any no-backend form, and true of every alternative too). In **Account →
 Security**, turn on the domain allowlist and add your live domain so the key
 can't be reused from anywhere else.
 
-### Cal.com setup (free)
+### Calendly setup — already done
 
-Create the event type at [cal.com](https://cal.com) and connect your Google
-Calendar so booked time is blocked out automatically. Then take the URL
-*without* the domain: a page at `https://cal.com/jafvisuals/photo-session`
-becomes `'jafvisuals/photo-session'`.
+The booking page is live at
+**https://calendly.com/mtanner877/photo-session** (90 minutes, Columbus area),
+and `calendlyUrl` in `index.html` already points at it. Nothing to paste.
 
-Set your working hours, session length, and buffer time on the Cal.com event —
-that's what drives the visible open/booked blocks. No availability data is
-stored in this repo.
+Things you may want to change, all in Calendly itself — the site picks them up
+automatically, no code edit needed:
+
+- **Your hours.** Availability defaults to 9:00–17:00 every day, Sunday
+  included. Set your real shooting hours under **Availability**.
+- **Connect your Google Calendar** so anything already in your diary blocks
+  those slots off. Until you do, Calendly only knows about Calendly bookings.
+- **Session length** is 90 minutes. Change it on the event type if your shoots
+  run longer or shorter.
+- **Your link name.** The URL says `mtanner877` because that's the account
+  username. Changing it to something like `jafvisuals` under **Account →
+  Link** makes the booking page look like yours — if you do, update
+  `calendlyUrl` in `index.html` to match, or the calendar will 404.
+
+Only change `calendlyUrl` if you rename the event or move bookings to a
+different Calendly account.
 
 ### Free tier limits
 
@@ -147,13 +159,17 @@ EmailJS free allows **200 requests/month** and 2 templates. Each booking costs
 you use the `notifyEmails` fallback above with two addresses, each booking
 costs 3 requests instead (~66/month).
 
-Cal.com's free plan covers a personal booking link and calendar sync.
+Calendly's free plan allows **one** event type and unlimited bookings, which
+is exactly what this uses. Calendly's own confirmation email to the client is
+free and separate from the EmailJS auto-reply.
 
 ### Notes
 
-- Both third-party scripts are **lazy-loaded** — they only download when a
-  visitor scrolls near the booking section, so browsing the portfolio stays as
-  dependency-free as the rest of the site.
+- Both third-party scripts (EmailJS and Calendly) are **lazy-loaded** — they
+  only download when a visitor scrolls near the booking section, so browsing
+  the portfolio stays as dependency-free as the rest of the site.
+- If Calendly fails to load, the section shows a fallback message pointing at
+  your email rather than an empty box.
 - Until the values are pasted in, the form and calendar show a "not connected
   yet" message rather than failing silently.
 - The auto-reply is sent *after* the notification and is non-fatal: if the

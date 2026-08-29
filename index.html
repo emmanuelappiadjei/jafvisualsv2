@@ -157,8 +157,8 @@ footer span:last-child{justify-self:end}
 .booking-sent h4{margin:0 0 8px;font-size:clamp(26px,2.4vw,36px);font-weight:700;line-height:.9;letter-spacing:-.03em}
 .booking-sent p{margin:0;font-size:20px;line-height:1.14}
 
-.cal-shell{border:1px solid var(--line);background:#fff;min-height:560px;overflow:hidden}
-.cal-mount{width:100%;height:100%;min-height:560px;overflow:auto}
+.cal-shell{border:1px solid var(--line);background:#fff;min-height:700px;overflow:hidden}
+.cal-mount{width:100%;height:100%;min-height:700px;overflow:auto}
 .cal-placeholder{margin:0;padding:clamp(24px,3vw,40px);font-size:20px;line-height:1.2;color:#555}
 
 @media(max-width:900px){
@@ -173,7 +173,7 @@ footer span:last-child{justify-self:end}
   .field-row{grid-template-columns:1fr;gap:0}
   .booking-submit{width:100%}
   .booking-status{max-width:none}
-  .cal-shell,.cal-mount{min-height:520px}
+  .cal-shell,.cal-mount{min-height:840px}
 }
 @media(prefers-reduced-motion:reduce){.booking-submit{transition:none}}
 
@@ -457,14 +457,14 @@ const BOOKING_CONFIG = {
   // anything you put here is public in this repo.
   notifyEmails: [],
 
-  // --- Cal.com ------------------------------------------------------------
-  // Your event link WITHOUT the domain.
-  // https://cal.com/jafvisuals/photo-session  ->  'jafvisuals/photo-session'
-  calLink: 'PASTE-YOUR-CAL-COM-LINK-HERE',
+  // --- Calendly -----------------------------------------------------------
+  // The full public link to your booking page. Change this if you rename the
+  // event or switch which account takes bookings.
+  calendlyUrl: 'https://calendly.com/mtanner877/photo-session',
 
-  // Leave these alone unless you self-host Cal.com.
-  calOrigin: 'https://cal.com',
-  calEmbedJs: 'https://app.cal.com/embed/embed.js',
+  // Leave these alone.
+  calendlyWidgetJs: 'https://assets.calendly.com/assets/external/widget.js',
+  calendlyWidgetCss: 'https://assets.calendly.com/assets/external/widget.css',
   emailjsSdk: 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js'
 };
 
@@ -507,84 +507,63 @@ const BOOKING_CONFIG = {
     }
   }
 
-  /* ---------- Cal.com inline embed ---------- */
-  let loaderInjected = false;
-  let calInstance = 0;
+  /* ---------- Calendly inline embed ---------- */
+  let calendlyInstance = 0;
 
-  function injectCalLoader(){
-    if(loaderInjected) return;
-    loaderInjected = true;
-    (function (C, A, L) {
-      const p = function (a, ar) { a.q.push(ar); };
-      const d = C.document;
-      C.Cal = C.Cal || function () {
-        const cal = C.Cal;
-        const ar = arguments;
-        if(!cal.loaded){
-          cal.ns = {};
-          cal.q = cal.q || [];
-          d.head.appendChild(d.createElement('script')).src = A;
-          cal.loaded = true;
-        }
-        if(ar[0] === L){
-          const api = function () { p(api, arguments); };
-          const namespace = ar[1];
-          api.q = api.q || [];
-          if(typeof namespace === 'string'){
-            cal.ns[namespace] = cal.ns[namespace] || api;
-            p(cal.ns[namespace], ar);
-            p(cal, ['initNamespace', namespace]);
-          } else {
-            p(cal, ar);
-          }
-          return;
-        }
-        p(cal, ar);
-      };
-    })(window, BOOKING_CONFIG.calEmbedJs, 'init');
+  function ensureCalendlyCss(){
+    if(document.getElementById('calendly-widget-css')) return;
+    const link = document.createElement('link');
+    link.id = 'calendly-widget-css';
+    link.rel = 'stylesheet';
+    link.href = BOOKING_CONFIG.calendlyWidgetCss;
+    document.head.appendChild(link);
   }
 
-  // Rendering is idempotent: calling it again tears the old embed down and
-  // rebuilds it under a fresh namespace, which is how the prefill gets applied.
-  function renderCal(prefill){
+  // Never throws: a calendar that fails to draw must not take anything else
+  // down with it. Calling it again tears the old widget out and rebuilds it,
+  // which is how the post-submit prefill gets applied.
+  async function renderCalendly(prefill){
     if(!shell) return;
-    if(isPlaceholder(BOOKING_CONFIG.calLink)){
-      shell.innerHTML = '<p class="cal-placeholder">The availability calendar isn’t connected yet — set <code>calLink</code> in index.html. Send the brief above and we’ll reply with times.</p>';
+    if(isPlaceholder(BOOKING_CONFIG.calendlyUrl)){
+      shell.innerHTML = '<p class="cal-placeholder">The availability calendar isn’t connected yet — set <code>calendlyUrl</code> in index.html. Send the brief above and we’ll reply with times.</p>';
       return;
     }
 
-    injectCalLoader();
-    calInstance += 1;
-    const ns = 'jafBooking' + calInstance;
-    const mountId = 'cal-mount-' + calInstance;
+    try {
+      ensureCalendlyCss();
+      await loadScript(BOOKING_CONFIG.calendlyWidgetJs);
 
-    shell.textContent = '';
-    const mount = document.createElement('div');
-    mount.id = mountId;
-    mount.className = 'cal-mount';
-    shell.appendChild(mount);
+      calendlyInstance += 1;
+      shell.textContent = '';
+      const mount = document.createElement('div');
+      mount.id = 'calendly-mount-' + calendlyInstance;
+      mount.className = 'cal-mount';
+      shell.appendChild(mount);
 
-    const config = { layout: 'month_view' };
-    if(prefill){
-      if(prefill.name)  config.name  = prefill.name;
-      if(prefill.email) config.email = prefill.email;
-      if(prefill.notes) config.notes = prefill.notes;
+      const url = BOOKING_CONFIG.calendlyUrl
+        + (BOOKING_CONFIG.calendlyUrl.indexOf('?') > -1 ? '&' : '?')
+        + 'hide_gdpr_banner=1';
+
+      const options = { url: url, parentElement: mount };
+      if(prefill){
+        options.prefill = {};
+        if(prefill.name)  options.prefill.name  = prefill.name;
+        if(prefill.email) options.prefill.email = prefill.email;
+        // a1 is Calendly's first custom question on the event type.
+        if(prefill.notes) options.prefill.customAnswers = { a1: prefill.notes };
+      }
+      window.Calendly.initInlineWidget(options);
+    } catch (error) {
+      console.error('Calendar failed to render:', error);
+      shell.innerHTML = '<p class="cal-placeholder">The calendar couldn’t load. Email hello@jafvisuals.com and we’ll sort a time out with you.</p>';
     }
-
-    Cal('init', ns, { origin: BOOKING_CONFIG.calOrigin });
-    Cal.ns[ns]('inline', { elementOrSelector: '#' + mountId, calLink: BOOKING_CONFIG.calLink, config: config });
-    Cal.ns[ns]('ui', {
-      layout: 'month_view',
-      hideEventTypeDetails: false,
-      cssVarsPerTheme: { light: { 'cal-brand': '#080808' }, dark: { 'cal-brand': '#ffffff' } }
-    });
   }
 
   // Hold everything back until the section is approached, so browsing the
   // portfolio stays as dependency-free as the rest of the page.
   const section = document.getElementById('booking');
   function warmUp(){
-    renderCal(null);
+    renderCalendly(null);
     if(emailjsReady()) readyEmailJs().catch(() => {}); // retried on submit
   }
   if(section && 'IntersectionObserver' in window){
@@ -680,16 +659,13 @@ const BOOKING_CONFIG = {
       refEl.hidden = false;
       refEl.innerHTML = 'Your reference: <b>' + reference + '</b><br/>Quote it in the booking notes if you need to change anything.';
     }
-    // A calendar that fails to draw must not make a received enquiry look lost.
-    try {
-      renderCal({
-        name: values.name,
-        email: values.email,
-        notes: values.shootType + ' — ' + values.description + ' (ref ' + reference + ')'
-      });
-    } catch (calError) {
-      console.error('Calendar failed to render:', calError);
-    }
+    // renderCalendly swallows its own failures, so a calendar that won't draw
+    // can never make a received enquiry look lost.
+    renderCalendly({
+      name: values.name,
+      email: values.email,
+      notes: values.shootType + ' — ' + values.description + ' (ref ' + reference + ')'
+    });
     if(sentEl) sentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
