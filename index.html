@@ -118,6 +118,65 @@ footer span:last-child{justify-self:end}
 }
 
 
+.booking{border-top:1px solid var(--line);padding:clamp(80px,10vw,150px) var(--pad) clamp(90px,11vw,160px);scroll-margin-top:58px}
+.booking-head{display:grid;grid-template-columns:70px 1fr;align-items:end;padding-bottom:clamp(34px,4.4vw,66px)}
+.booking-head h2{margin:0;font-size:clamp(58px,7.6vw,122px);font-weight:700;line-height:.76;letter-spacing:-.055em}
+.booking-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gap) var(--gap);row-gap:clamp(40px,5vw,86px)}
+.booking-rail{grid-column:1/5;border-top:1px solid var(--line);padding-top:12px}
+.booking-body{grid-column:5/13}
+.booking-step{margin:0 0 10px;font-size:15px;letter-spacing:.14em;text-transform:uppercase}
+.booking-rail h3{margin:0 0 14px;font-size:clamp(32px,3.4vw,52px);font-weight:700;line-height:.84;letter-spacing:-.035em}
+.booking-note{margin:0;font-size:clamp(19px,1.35vw,23px);line-height:1.12;max-width:34ch}
+.booking-ref{margin:18px 0 0;font-size:19px;line-height:1.15;border-top:1px solid var(--line);padding-top:10px}
+.booking-ref b{font-weight:700;letter-spacing:.04em}
+
+.field{margin:0 0 clamp(20px,2.2vw,30px)}
+.field label{display:block;font-size:15px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}
+.field input,.field select,.field textarea{display:block;width:100%;font-family:var(--hand);font-weight:500;font-size:clamp(21px,1.7vw,28px);line-height:1.25;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:7px 2px;-webkit-appearance:none;appearance:none}
+.field textarea{border:1px solid var(--line);padding:10px 12px;min-height:132px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #111;outline-offset:3px}
+.field input::placeholder,.field textarea::placeholder{color:#9a9a9a}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.select-wrap{position:relative;display:block}
+.select-wrap::after{content:"";position:absolute;right:6px;top:50%;width:8px;height:8px;border-right:1px solid #111;border-bottom:1px solid #111;transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.field select{cursor:pointer;padding-right:26px}
+.field.invalid input,.field.invalid select{border-bottom-color:#b00020}
+.field.invalid textarea{border-color:#b00020}
+.field-error{display:block;margin-top:5px;font-size:17px;color:#b00020;line-height:1.1}
+.botcheck{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.booking-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:6px}
+.booking-submit{font-family:var(--hand);font-weight:600;font-size:clamp(22px,1.9vw,30px);line-height:1;background:#080808;color:#fff;border:1px solid #080808;border-radius:0;padding:14px 36px;cursor:pointer;transition:background .18s ease,color .18s ease}
+.booking-submit:hover:not(:disabled){background:#fff;color:#080808}
+.booking-submit:disabled{opacity:.45;cursor:default}
+.booking-status{margin:0;font-size:20px;line-height:1.12;max-width:38ch}
+.booking-status.is-error{color:#b00020}
+
+.booking-sent{border:1px solid var(--line);padding:clamp(18px,2vw,26px);margin-bottom:clamp(22px,2.6vw,34px)}
+.booking-sent[hidden]{display:none}
+.booking-sent h4{margin:0 0 8px;font-size:clamp(26px,2.4vw,36px);font-weight:700;line-height:.9;letter-spacing:-.03em}
+.booking-sent p{margin:0;font-size:20px;line-height:1.14}
+
+.cal-shell{border:1px solid var(--line);background:#fff;min-height:560px;overflow:hidden}
+.cal-mount{width:100%;height:100%;min-height:560px;overflow:auto}
+.cal-placeholder{margin:0;padding:clamp(24px,3vw,40px);font-size:20px;line-height:1.2;color:#555}
+
+@media(max-width:900px){
+  .booking-head{grid-template-columns:54px 1fr}
+  .booking-rail,.booking-body{grid-column:1/13}
+  .booking-rail{margin-bottom:-14px}
+}
+@media(max-width:680px){
+  .booking{padding-left:14px;padding-right:14px}
+  .booking-head{grid-template-columns:38px 1fr;padding-bottom:28px}
+  .booking-head h2{font-size:16vw}
+  .field-row{grid-template-columns:1fr;gap:0}
+  .booking-submit{width:100%}
+  .booking-status{max-width:none}
+  .cal-shell,.cal-mount{min-height:520px}
+}
+@media(prefers-reduced-motion:reduce){.booking-submit{transition:none}}
+
 .lightbox[hidden]{display:none}
 .lightbox{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);display:grid;place-items:center;padding:clamp(18px,3vw,42px);cursor:zoom-out}
 .lightbox-inner{position:relative;width:100%;height:100%;display:grid;place-items:center}
@@ -138,6 +197,7 @@ body.lightbox-open{overflow:hidden}
 <nav aria-label="Primary navigation" class="nav">
 <a href="#fashion">Work</a>
 <a href="#about">About</a>
+<a href="#booking">Booking</a>
 <a href="mailto:hello@jafvisuals.com">Contact</a>
 </nav>
 </div>
@@ -241,6 +301,52 @@ body.lightbox-open{overflow:hidden}
 </div>
 </div>
 </section>
+<section class="booking" id="booking">
+<div class="booking-head"><div class="section-number">05</div><h2>Booking</h2></div>
+<div class="booking-grid">
+<div class="booking-rail">
+<p class="booking-step">Step 01</p>
+<h3>The brief</h3>
+<p class="booking-note">Tell us who you are and what you have in mind. Every enquiry is read by us, not a bot.</p>
+</div>
+<div class="booking-body">
+<div class="booking-sent" hidden="" id="booking-sent" role="status">
+<h4>Brief received.</h4>
+<p>Now pick a time below — your details are already filled in. We'll confirm by email once you've chosen a slot.</p>
+</div>
+<form class="booking-form" id="booking-form" novalidate="">
+<div class="field-row">
+<p class="field"><label for="bf-name">Name</label><input autocomplete="name" id="bf-name" name="name" required="" type="text"/></p>
+<p class="field"><label for="bf-phone">Phone</label><input autocomplete="tel" id="bf-phone" name="phone" required="" type="tel"/></p>
+</div>
+<p class="field"><label for="bf-email">Email</label><input autocomplete="email" id="bf-email" name="email" required="" type="email"/></p>
+<p class="field"><label for="bf-type">Shoot type</label><span class="select-wrap"><select id="bf-type" name="shoot_type" required="">
+<option value="">Choose one…</option>
+<option value="Fashion &amp; Editorial">Fashion &amp; Editorial</option>
+<option value="Portraits">Portraits</option>
+<option value="Maternity">Maternity</option>
+<option value="Milestones">Milestones</option>
+<option value="Something else">Something else</option>
+</select></span></p>
+<p class="field"><label for="bf-desc">Shoot description</label><textarea id="bf-desc" name="description" placeholder="Location, mood, how many people, what it's for, anything you're picturing…" required="" rows="5"></textarea></p>
+<input aria-hidden="true" autocomplete="off" class="botcheck" name="botcheck" tabindex="-1" type="checkbox"/>
+<div class="booking-actions">
+<button class="booking-submit" id="booking-submit" type="submit">Send the brief</button>
+<p aria-live="polite" class="booking-status" id="booking-status"></p>
+</div>
+</form>
+</div>
+<div class="booking-rail">
+<p class="booking-step">Step 02</p>
+<h3>Pick a time</h3>
+<p class="booking-note">Open blocks are selectable — anything already booked is greyed out. Times show in your own timezone.</p>
+<p class="booking-ref" hidden="" id="booking-ref"></p>
+</div>
+<div class="booking-body">
+<div class="cal-shell" id="cal-shell"><p class="cal-placeholder">Loading available times…</p></div>
+</div>
+</div>
+</section>
 </main>
 <footer>
 <span class="footer-brand"><span aria-hidden="true">© 2026</span><img alt="JAF Visuals" draggable="false" height="101" src="assets/images/brand/jaf-visuals-dark.png" width="636"/></span>
@@ -326,6 +432,274 @@ body.lightbox-open{overflow:hidden}
       target.scrollIntoView({behavior:'smooth',block:'start'});
       if(history.pushState) history.pushState(null,'',id);
     });
+  });
+})();
+</script>
+<script>
+/* ============================================================
+   BOOKING — configuration.  Fill in the two PASTE-... values.
+   Full walkthrough in README.md → "Booking form setup".
+   ============================================================ */
+const BOOKING_CONFIG = {
+  // 1. Free access key from https://web3forms.com — enter your email, copy the key it mails you.
+  //    To have BOTH of you notified, add the second address in the Web3Forms dashboard under
+  //    "Linked Emails". The free plan carries 3 addresses and 250 submissions/month.
+  web3formsAccessKey: 'PASTE-YOUR-WEB3FORMS-ACCESS-KEY-HERE',
+
+  // 2. Your Cal.com event, WITHOUT the https://cal.com/ prefix.
+  //    A page at https://cal.com/jafvisuals/photo-session becomes 'jafvisuals/photo-session'.
+  calLink: 'PASTE-YOUR-CAL-COM-LINK-HERE',
+
+  // Leave these alone unless you self-host Cal.com.
+  calOrigin: 'https://cal.com',
+  calEmbedJs: 'https://app.cal.com/embed/embed.js'
+};
+
+(() => {
+  const form = document.getElementById('booking-form');
+  if(!form) return;
+
+  const statusEl = document.getElementById('booking-status');
+  const submitBtn = document.getElementById('booking-submit');
+  const sentEl = document.getElementById('booking-sent');
+  const refEl = document.getElementById('booking-ref');
+  const shell = document.getElementById('cal-shell');
+  const isPlaceholder = (value) => !value || value.indexOf('PASTE-') === 0;
+
+  /* ---------- Cal.com inline embed (loaded on demand, never on page load) ---------- */
+  let loaderInjected = false;
+  let calInstance = 0;
+
+  function injectCalLoader(){
+    if(loaderInjected) return;
+    loaderInjected = true;
+    (function (C, A, L) {
+      const p = function (a, ar) { a.q.push(ar); };
+      const d = C.document;
+      C.Cal = C.Cal || function () {
+        const cal = C.Cal;
+        const ar = arguments;
+        if(!cal.loaded){
+          cal.ns = {};
+          cal.q = cal.q || [];
+          d.head.appendChild(d.createElement('script')).src = A;
+          cal.loaded = true;
+        }
+        if(ar[0] === L){
+          const api = function () { p(api, arguments); };
+          const namespace = ar[1];
+          api.q = api.q || [];
+          if(typeof namespace === 'string'){
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            p(cal.ns[namespace], ar);
+            p(cal, ['initNamespace', namespace]);
+          } else {
+            p(cal, ar);
+          }
+          return;
+        }
+        p(cal, ar);
+      };
+    })(window, BOOKING_CONFIG.calEmbedJs, 'init');
+  }
+
+  // Rendering is idempotent: calling it again tears the old embed down and rebuilds it
+  // under a fresh namespace, which is how the post-submit prefill gets applied.
+  function renderCal(prefill){
+    if(!shell) return;
+    if(isPlaceholder(BOOKING_CONFIG.calLink)){
+      shell.innerHTML = '<p class="cal-placeholder">The availability calendar isn’t connected yet — set <code>calLink</code> in index.html. Send the brief above and we’ll reply with times.</p>';
+      return;
+    }
+
+    injectCalLoader();
+    calInstance += 1;
+    const ns = 'jafBooking' + calInstance;
+    const mountId = 'cal-mount-' + calInstance;
+
+    shell.textContent = '';
+    const mount = document.createElement('div');
+    mount.id = mountId;
+    mount.className = 'cal-mount';
+    shell.appendChild(mount);
+
+    const config = { layout: 'month_view' };
+    if(prefill){
+      if(prefill.name)  config.name  = prefill.name;
+      if(prefill.email) config.email = prefill.email;
+      if(prefill.notes) config.notes = prefill.notes;
+    }
+
+    Cal('init', ns, { origin: BOOKING_CONFIG.calOrigin });
+    Cal.ns[ns]('inline', { elementOrSelector: '#' + mountId, calLink: BOOKING_CONFIG.calLink, config: config });
+    Cal.ns[ns]('ui', {
+      layout: 'month_view',
+      hideEventTypeDetails: false,
+      cssVarsPerTheme: { light: { 'cal-brand': '#080808' }, dark: { 'cal-brand': '#ffffff' } }
+    });
+  }
+
+  // Hold the embed back until the section is actually approached, so browsing the
+  // portfolio stays as dependency-free as the rest of the page.
+  const section = document.getElementById('booking');
+  if(section && 'IntersectionObserver' in window){
+    const observer = new IntersectionObserver((entries, obs) => {
+      if(entries.some(entry => entry.isIntersecting)){
+        obs.disconnect();
+        renderCal(null);
+      }
+    }, { rootMargin: '400px 0px' });
+    observer.observe(section);
+  } else {
+    renderCal(null);
+  }
+
+  /* ---------- Validation ---------- */
+  const fieldOf = (input) => input.closest('.field');
+
+  function setError(input, message){
+    const field = fieldOf(input);
+    if(!field) return;
+    field.classList.add('invalid');
+    let error = field.querySelector('.field-error');
+    if(!error){
+      error = document.createElement('span');
+      error.className = 'field-error';
+      field.appendChild(error);
+    }
+    error.textContent = message;
+    input.setAttribute('aria-invalid', 'true');
+  }
+
+  function clearError(input){
+    const field = fieldOf(input);
+    if(!field) return;
+    field.classList.remove('invalid');
+    const error = field.querySelector('.field-error');
+    if(error) error.remove();
+    input.removeAttribute('aria-invalid');
+  }
+
+  function validate(){
+    const checks = [
+      ['bf-name',  (v) => v.length >= 2,                        'Please tell us your name.'],
+      ['bf-phone', (v) => v.replace(/\D/g, '').length >= 7,     'Please add a number we can reach you on.'],
+      ['bf-email', (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v), 'Please check the email address.'],
+      ['bf-type',  (v) => v !== '',                             'Pick the kind of shoot.'],
+      ['bf-desc',  (v) => v.length >= 10,                       'A sentence or two about the shoot, please.']
+    ];
+    let firstBad = null;
+    checks.forEach(([id, test, message]) => {
+      const input = document.getElementById(id);
+      if(!input) return;
+      if(test(input.value.trim())){
+        clearError(input);
+      } else {
+        setError(input, message);
+        if(!firstBad) firstBad = input;
+      }
+    });
+    return firstBad;
+  }
+
+  form.querySelectorAll('input, select, textarea').forEach(input => {
+    input.addEventListener('input', () => { if(fieldOf(input) && fieldOf(input).classList.contains('invalid')) validate(); });
+  });
+
+  /* ---------- Submit ---------- */
+  // Short human-quotable code so a Web3Forms email and a Cal.com booking can be
+  // matched to each other — the two services don't share any state.
+  function makeReference(){
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let out = '';
+    if(window.crypto && window.crypto.getRandomValues){
+      const bytes = new Uint8Array(5);
+      window.crypto.getRandomValues(bytes);
+      bytes.forEach(b => { out += alphabet[b % alphabet.length]; });
+    } else {
+      for(let i = 0; i < 5; i++) out += alphabet[Math.floor(Math.random() * alphabet.length)];
+    }
+    return 'JAF-' + out;
+  }
+
+  function setStatus(message, isError){
+    if(!statusEl) return;
+    statusEl.textContent = message;
+    statusEl.classList.toggle('is-error', !!isError);
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const firstBad = validate();
+    if(firstBad){
+      setStatus('', false);
+      firstBad.focus({ preventScroll: false });
+      return;
+    }
+
+    if(isPlaceholder(BOOKING_CONFIG.web3formsAccessKey)){
+      setStatus('This form isn’t connected yet. Email hello@jafvisuals.com in the meantime.', true);
+      return;
+    }
+
+    const values = {
+      name: document.getElementById('bf-name').value.trim(),
+      phone: document.getElementById('bf-phone').value.trim(),
+      email: document.getElementById('bf-email').value.trim(),
+      shootType: document.getElementById('bf-type').value,
+      description: document.getElementById('bf-desc').value.trim()
+    };
+    const reference = makeReference();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    setStatus('', false);
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: BOOKING_CONFIG.web3formsAccessKey,
+          subject: 'New booking request — ' + values.name + ' · ' + values.shootType + ' [' + reference + ']',
+          from_name: 'JAF Visuals website',
+          // Web3Forms reads `email` to set the reply-to, so replying goes straight to the client.
+          email: values.email,
+          Reference: reference,
+          Name: values.name,
+          Phone: values.phone,
+          'Shoot type': values.shootType,
+          'Shoot description': values.description,
+          Submitted: new Date().toLocaleString(),
+          botcheck: form.querySelector('[name="botcheck"]').checked
+        })
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if(response.ok && result.success){
+        form.hidden = true;
+        if(sentEl) sentEl.hidden = false;
+        if(refEl){
+          refEl.hidden = false;
+          refEl.innerHTML = 'Your reference: <b>' + reference + '</b><br/>Quote it in the booking notes if you need to change anything.';
+        }
+        renderCal({
+          name: values.name,
+          email: values.email,
+          notes: values.shootType + ' — ' + values.description + ' (ref ' + reference + ')'
+        });
+        if(sentEl) sentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        throw new Error(result.message || 'Submission failed');
+      }
+    } catch (error) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send the brief';
+      setStatus('That didn’t send. Please try again, or email hello@jafvisuals.com directly.', true);
+      console.error('Booking form submission failed:', error);
+    }
   });
 })();
 </script>
