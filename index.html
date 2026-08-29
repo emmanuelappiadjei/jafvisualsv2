@@ -437,22 +437,35 @@ body.lightbox-open{overflow:hidden}
 </script>
 <script>
 /* ============================================================
-   BOOKING — configuration.  Fill in the two PASTE-... values.
+   BOOKING — configuration.  Fill in the five PASTE-... values.
    Full walkthrough in README.md → "Booking form setup".
+
+   Note: no email addresses live in this file. Who gets notified is set
+   on the EmailJS template itself, so your inboxes stay out of this
+   public repo.
    ============================================================ */
 const BOOKING_CONFIG = {
-  // 1. Free access key from https://web3forms.com — enter your email, copy the key it mails you.
-  //    To have BOTH of you notified, add the second address in the Web3Forms dashboard under
-  //    "Linked Emails". The free plan carries 3 addresses and 250 submissions/month.
-  web3formsAccessKey: 'PASTE-YOUR-WEB3FORMS-ACCESS-KEY-HERE',
+  // --- EmailJS (https://dashboard.emailjs.com) ---------------------------
+  emailjsPublicKey: 'PASTE-YOUR-EMAILJS-PUBLIC-KEY-HERE',   // Account → General
+  emailjsServiceId: 'PASTE-YOUR-EMAILJS-SERVICE-ID-HERE',   // Email Services
+  emailjsNotifyTemplate: 'PASTE-NOTIFICATION-TEMPLATE-ID',  // template 1 → to you + your friend
+  emailjsReplyTemplate:  'PASTE-AUTO-REPLY-TEMPLATE-ID',    // template 2 → to whoever filled the form
 
-  // 2. Your Cal.com event, WITHOUT the https://cal.com/ prefix.
-  //    A page at https://cal.com/jafvisuals/photo-session becomes 'jafvisuals/photo-session'.
+  // Optional. Leave empty and the notification goes wherever the template's
+  // "To Email" says. Only fill this if you'd rather drive recipients from
+  // here — each address costs one extra EmailJS request per booking, and
+  // anything you put here is public in this repo.
+  notifyEmails: [],
+
+  // --- Cal.com ------------------------------------------------------------
+  // Your event link WITHOUT the domain.
+  // https://cal.com/jafvisuals/photo-session  ->  'jafvisuals/photo-session'
   calLink: 'PASTE-YOUR-CAL-COM-LINK-HERE',
 
   // Leave these alone unless you self-host Cal.com.
   calOrigin: 'https://cal.com',
-  calEmbedJs: 'https://app.cal.com/embed/embed.js'
+  calEmbedJs: 'https://app.cal.com/embed/embed.js',
+  emailjsSdk: 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js'
 };
 
 (() => {
@@ -466,7 +479,35 @@ const BOOKING_CONFIG = {
   const shell = document.getElementById('cal-shell');
   const isPlaceholder = (value) => !value || value.indexOf('PASTE-') === 0;
 
-  /* ---------- Cal.com inline embed (loaded on demand, never on page load) ---------- */
+  const emailjsReady = () => !isPlaceholder(BOOKING_CONFIG.emailjsPublicKey)
+    && !isPlaceholder(BOOKING_CONFIG.emailjsServiceId)
+    && !isPlaceholder(BOOKING_CONFIG.emailjsNotifyTemplate);
+
+  /* ---------- Third-party scripts, fetched only when actually needed ---------- */
+  const scriptCache = {};
+  function loadScript(src){
+    if(scriptCache[src]) return scriptCache[src];
+    scriptCache[src] = new Promise((resolve, reject) => {
+      const tag = document.createElement('script');
+      tag.src = src;
+      tag.async = true;
+      tag.onload = resolve;
+      tag.onerror = () => reject(new Error('Failed to load ' + src));
+      document.head.appendChild(tag);
+    });
+    return scriptCache[src];
+  }
+
+  let emailjsInitialised = false;
+  async function readyEmailJs(){
+    await loadScript(BOOKING_CONFIG.emailjsSdk);
+    if(!emailjsInitialised){
+      window.emailjs.init({ publicKey: BOOKING_CONFIG.emailjsPublicKey });
+      emailjsInitialised = true;
+    }
+  }
+
+  /* ---------- Cal.com inline embed ---------- */
   let loaderInjected = false;
   let calInstance = 0;
 
@@ -503,8 +544,8 @@ const BOOKING_CONFIG = {
     })(window, BOOKING_CONFIG.calEmbedJs, 'init');
   }
 
-  // Rendering is idempotent: calling it again tears the old embed down and rebuilds it
-  // under a fresh namespace, which is how the post-submit prefill gets applied.
+  // Rendering is idempotent: calling it again tears the old embed down and
+  // rebuilds it under a fresh namespace, which is how the prefill gets applied.
   function renderCal(prefill){
     if(!shell) return;
     if(isPlaceholder(BOOKING_CONFIG.calLink)){
@@ -539,19 +580,20 @@ const BOOKING_CONFIG = {
     });
   }
 
-  // Hold the embed back until the section is actually approached, so browsing the
+  // Hold everything back until the section is approached, so browsing the
   // portfolio stays as dependency-free as the rest of the page.
   const section = document.getElementById('booking');
+  function warmUp(){
+    renderCal(null);
+    if(emailjsReady()) readyEmailJs().catch(() => {}); // retried on submit
+  }
   if(section && 'IntersectionObserver' in window){
     const observer = new IntersectionObserver((entries, obs) => {
-      if(entries.some(entry => entry.isIntersecting)){
-        obs.disconnect();
-        renderCal(null);
-      }
+      if(entries.some(entry => entry.isIntersecting)){ obs.disconnect(); warmUp(); }
     }, { rootMargin: '400px 0px' });
     observer.observe(section);
   } else {
-    renderCal(null);
+    warmUp();
   }
 
   /* ---------- Validation ---------- */
@@ -582,11 +624,11 @@ const BOOKING_CONFIG = {
 
   function validate(){
     const checks = [
-      ['bf-name',  (v) => v.length >= 2,                        'Please tell us your name.'],
-      ['bf-phone', (v) => v.replace(/\D/g, '').length >= 7,     'Please add a number we can reach you on.'],
+      ['bf-name',  (v) => v.length >= 2,                           'Please tell us your name.'],
+      ['bf-phone', (v) => v.replace(/\D/g, '').length >= 7,        'Please add a number we can reach you on.'],
       ['bf-email', (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v), 'Please check the email address.'],
-      ['bf-type',  (v) => v !== '',                             'Pick the kind of shoot.'],
-      ['bf-desc',  (v) => v.length >= 10,                       'A sentence or two about the shoot, please.']
+      ['bf-type',  (v) => v !== '',                                'Pick the kind of shoot.'],
+      ['bf-desc',  (v) => v.length >= 10,                          'A sentence or two about the shoot, please.']
     ];
     let firstBad = null;
     checks.forEach(([id, test, message]) => {
@@ -603,12 +645,15 @@ const BOOKING_CONFIG = {
   }
 
   form.querySelectorAll('input, select, textarea').forEach(input => {
-    input.addEventListener('input', () => { if(fieldOf(input) && fieldOf(input).classList.contains('invalid')) validate(); });
+    input.addEventListener('input', () => {
+      const field = fieldOf(input);
+      if(field && field.classList.contains('invalid')) validate();
+    });
   });
 
   /* ---------- Submit ---------- */
-  // Short human-quotable code so a Web3Forms email and a Cal.com booking can be
-  // matched to each other — the two services don't share any state.
+  // Short human-quotable code so an EmailJS notification and a Cal.com booking
+  // can be matched to each other — the two services share no state.
   function makeReference(){
     const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let out = '';
@@ -628,6 +673,26 @@ const BOOKING_CONFIG = {
     statusEl.classList.toggle('is-error', !!isError);
   }
 
+  function showBooked(values, reference){
+    form.hidden = true;
+    if(sentEl) sentEl.hidden = false;
+    if(refEl){
+      refEl.hidden = false;
+      refEl.innerHTML = 'Your reference: <b>' + reference + '</b><br/>Quote it in the booking notes if you need to change anything.';
+    }
+    // A calendar that fails to draw must not make a received enquiry look lost.
+    try {
+      renderCal({
+        name: values.name,
+        email: values.email,
+        notes: values.shootType + ' — ' + values.description + ' (ref ' + reference + ')'
+      });
+    } catch (calError) {
+      console.error('Calendar failed to render:', calError);
+    }
+    if(sentEl) sentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
@@ -635,11 +700,6 @@ const BOOKING_CONFIG = {
     if(firstBad){
       setStatus('', false);
       firstBad.focus({ preventScroll: false });
-      return;
-    }
-
-    if(isPlaceholder(BOOKING_CONFIG.web3formsAccessKey)){
-      setStatus('This form isn’t connected yet. Email hello@jafvisuals.com in the meantime.', true);
       return;
     }
 
@@ -652,54 +712,67 @@ const BOOKING_CONFIG = {
     };
     const reference = makeReference();
 
+    // Honeypot: a real person never ticks this. Look successful, send nothing.
+    if(form.querySelector('[name="botcheck"]').checked){
+      showBooked(values, reference);
+      return;
+    }
+
+    if(!emailjsReady()){
+      setStatus('This form isn’t connected yet. Email hello@jafvisuals.com in the meantime.', true);
+      return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending…';
     setStatus('', false);
 
+    const params = {
+      reference: reference,
+      name: values.name,
+      phone: values.phone,
+      email: values.email,           // auto-reply template addresses {{email}}
+      shoot_type: values.shootType,
+      description: values.description,
+      submitted: new Date().toLocaleString()
+    };
+
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          access_key: BOOKING_CONFIG.web3formsAccessKey,
-          subject: 'New booking request — ' + values.name + ' · ' + values.shootType + ' [' + reference + ']',
-          from_name: 'JAF Visuals website',
-          // Web3Forms reads `email` to set the reply-to, so replying goes straight to the client.
-          email: values.email,
-          Reference: reference,
-          Name: values.name,
-          Phone: values.phone,
-          'Shoot type': values.shootType,
-          'Shoot description': values.description,
-          Submitted: new Date().toLocaleString(),
-          botcheck: form.querySelector('[name="botcheck"]').checked
-        })
-      });
+      await readyEmailJs();
 
-      const result = await response.json().catch(() => ({}));
-
-      if(response.ok && result.success){
-        form.hidden = true;
-        if(sentEl) sentEl.hidden = false;
-        if(refEl){
-          refEl.hidden = false;
-          refEl.innerHTML = 'Your reference: <b>' + reference + '</b><br/>Quote it in the booking notes if you need to change anything.';
+      // 1. Notify the studio. Recipients normally come from the template's
+      //    "To Email"; notifyEmails overrides that, one send per address.
+      const recipients = Array.isArray(BOOKING_CONFIG.notifyEmails) ? BOOKING_CONFIG.notifyEmails : [];
+      if(recipients.length){
+        for(const to of recipients){
+          await emailjs.send(BOOKING_CONFIG.emailjsServiceId, BOOKING_CONFIG.emailjsNotifyTemplate,
+            Object.assign({}, params, { notify_email: to }));
         }
-        renderCal({
-          name: values.name,
-          email: values.email,
-          notes: values.shootType + ' — ' + values.description + ' (ref ' + reference + ')'
-        });
-        if(sentEl) sentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
-        throw new Error(result.message || 'Submission failed');
+        await emailjs.send(BOOKING_CONFIG.emailjsServiceId, BOOKING_CONFIG.emailjsNotifyTemplate, params);
       }
+
+      // 2. Auto-reply to the client. Deliberately after the notification and
+      //    non-fatal: a failed confirmation must not lose us the enquiry.
+      if(!isPlaceholder(BOOKING_CONFIG.emailjsReplyTemplate)){
+        try {
+          await emailjs.send(BOOKING_CONFIG.emailjsServiceId, BOOKING_CONFIG.emailjsReplyTemplate, params);
+        } catch (replyError) {
+          console.warn('Booking auto-reply failed (enquiry was still received):', replyError);
+        }
+      }
+
     } catch (error) {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Send the brief';
       setStatus('That didn’t send. Please try again, or email hello@jafvisuals.com directly.', true);
       console.error('Booking form submission failed:', error);
+      return;
     }
+
+    // Only reached once the notification is genuinely away, and deliberately
+    // outside the try: nothing the confirmation UI does can retract that.
+    showBooked(values, reference);
   });
 })();
 </script>
