@@ -43,8 +43,8 @@ server or install needed.
 - **About photo** — replace `assets/images/about-placeholder.jpg` with an
   actual headshot (keep the same filename, or update the `src` in
   `index.html` if you rename it).
-- **Booking form** — paste your EmailJS keys and Cal.com link into
-  `BOOKING_CONFIG` in `index.html` (see "Booking form setup" below).
+- **Booking form** — paste your EmailJS keys into `BOOKING_CONFIG` in
+  `index.html`. The Calendly link is already set (see "Booking form setup").
 - **Instagram link** — currently a dead `#` link in the About section and
   nowhere else; add the real URL.
 
