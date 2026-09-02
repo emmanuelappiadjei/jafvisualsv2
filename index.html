@@ -4,8 +4,8 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="JAF Visuals — fashion, portrait, maternity and milestone photography in Nashville, Tennessee." name="description"/>
-<title>JAF Visuals — Photography</title>
+<meta content="JAFVISUAL — fashion, portrait, maternity and milestone photography in Nashville, Tennessee." name="description"/>
+<title>JAFVISUAL — Photography</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -196,6 +196,17 @@ footer span:last-child{justify-self:end}
 }
 @media(prefers-reduced-motion:reduce){.booking-submit{transition:none}}
 
+.intro[hidden]{display:none}
+.intro{position:fixed;inset:0;z-index:300;background:#050505;display:grid;place-items:center;padding:clamp(24px,7vw,90px);opacity:1;transition:opacity .55s ease}
+/* The global img rule carries opacity:1!important, so the fade rides on this
+   wrapper instead of the image itself rather than starting an !important war. */
+.intro-mark{width:min(62vw,470px);opacity:0;transform:translateY(7px);transition:opacity .85s ease,transform .85s cubic-bezier(.16,1,.3,1)}
+.intro-mark img{width:100%;height:auto}
+.intro.is-lit .intro-mark{opacity:1;transform:none}
+.intro.is-done{opacity:0;pointer-events:none}
+body.intro-open{overflow:hidden}
+@media(prefers-reduced-motion:reduce){.intro,.intro img{transition:none}}
+
 .lightbox[hidden]{display:none}
 .lightbox{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);display:grid;place-items:center;padding:clamp(18px,3vw,42px);cursor:zoom-out}
 .lightbox-inner{position:relative;width:100%;height:100%;display:grid;place-items:center}
@@ -210,22 +221,65 @@ body.lightbox-open{overflow:hidden}
 </style>
 </head>
 <body>
+<div aria-hidden="true" class="intro" hidden="" id="intro"><div class="intro-mark"><img alt="" draggable="false" height="101" src="assets/images/brand/jaf-visuals-light.png" width="636"/></div></div>
+<script>
+// Runs before the page below it paints, so the curtain is up first and there's
+// no flash of the site. The overlay ships hidden and is only revealed here, so
+// a visitor without JavaScript never gets a black screen with no way out.
+(() => {
+  const intro = document.getElementById('intro');
+  if(!intro) return;
+
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let alreadySeen = false;
+  try { alreadySeen = sessionStorage.getItem('jafvisual-intro') === 'seen'; } catch (error) { /* private mode */ }
+  if(reduced || alreadySeen) return;
+  try { sessionStorage.setItem('jafvisual-intro', 'seen'); } catch (error) { /* private mode */ }
+
+  intro.hidden = false;
+  document.body.classList.add('intro-open');
+
+  let finished = false;
+  function finish(){
+    if(finished) return;
+    finished = true;
+    intro.classList.add('is-done');
+    document.body.classList.remove('intro-open');
+    setTimeout(() => intro.remove(), 700);
+  }
+  function start(){
+    // The overlay was display:none a moment ago, and a transition can't run in
+    // the same frame the element becomes visible. Force a reflow, then flip the
+    // class a frame later, so the fade actually plays instead of snapping.
+    void intro.offsetWidth;
+    requestAnimationFrame(() => requestAnimationFrame(() => intro.classList.add('is-lit')));
+    setTimeout(finish, 1750);
+  }
+
+  const logo = intro.querySelector('img');
+  if(logo.complete) start();
+  else { logo.addEventListener('load', start); logo.addEventListener('error', finish); }
+
+  // Whatever happens — slow network, decode failure — the curtain always lifts.
+  setTimeout(finish, 4000);
+})();
+</script>
 <header class="site-header">
 <div class="header-inner">
-<a aria-label="JAF Visuals home" class="wordmark" href="#top"><img alt="JAF Visuals" draggable="false" height="101" src="assets/images/brand/jaf-visuals-dark.png" width="636"/></a>
+<a aria-label="JAFVISUAL home" class="wordmark" href="#top"><img alt="JAFVISUAL" draggable="false" height="101" src="assets/images/brand/jaf-visuals-dark.png" width="636"/></a>
 <nav aria-label="Primary navigation" class="nav">
 <a href="#fashion">Work</a>
 <a href="#about">About</a>
-<a href="mailto:hello@jafvisuals.com">Contact</a>
+<a href="mailto:jaf.visual@gmail.com">Contact</a>
 <a class="nav-cta" href="#booking">Booking</a>
 </nav>
 </div>
 </header>
 <main id="top">
 <section aria-label="Featured fashion work" class="hero">
-<div class="hero-brand"><picture><source media="(max-width:680px)" srcset="assets/images/brand/jaf-visuals-light.png"/><img alt="JAF Visuals" draggable="false" height="636" src="assets/images/brand/jaf-visuals-light-vertical.png" width="101"/></picture></div>
-<figure><img alt="Fashion editorial portrait by JAF Visuals" draggable="false" fetchpriority="high" height="1066" src="assets/images/fashion/aaliyah-b-day-finals-2.jpg" width="800"/></figure>
-<figure><img alt="Fashion portrait by JAF Visuals" draggable="false" fetchpriority="high" height="1000" src="assets/images/fashion/alazar-s-cowboy-fit-close-up-portriats-5.jpg" width="800"/></figure>
+<div class="hero-brand"><picture><source media="(max-width:680px)" srcset="assets/images/brand/jaf-visuals-light.png"/><img alt="JAFVISUAL" draggable="false" height="636" src="assets/images/brand/jaf-visuals-light-vertical.png" width="101"/></picture></div>
+<figure><img alt="Fashion editorial portrait by JAFVISUAL" draggable="false" fetchpriority="high" height="1066" src="assets/images/fashion/aaliyah-b-day-finals-2.jpg" width="800"/></figure>
+<figure><img alt="Fashion portrait by JAFVISUAL" draggable="false" fetchpriority="high" height="1000" src="assets/images/fashion/alazar-s-cowboy-fit-close-up-portriats-5.jpg" width="800"/></figure>
 </section>
 <nav aria-label="Portfolio categories" class="category-strip">
 <a href="#fashion"><span>01</span>Fashion &amp; Editorial</a>
@@ -236,77 +290,77 @@ body.lightbox-open{overflow:hidden}
 <section class="work-section" id="fashion">
 <div class="section-head"><div class="section-number">01</div><h2>Fashion &amp; Editorial</h2></div>
 <div class="art-row">
-<figure class="frame" style="grid-column:1 / span 7"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/aliyah-s-birthday-shoot-4x5-s-08.jpg" width="800"/></figure>
-<figure class="frame shift-s" style="grid-column:9 / span 4"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/fashion/aaliyah-b-day-finals-10.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:1 / span 7"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/aliyah-s-birthday-shoot-4x5-s-08.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:9 / span 4"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/fashion/aaliyah-b-day-finals-10.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame shift-m" style="grid-column:1 / span 4"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/amirah-s-final-edits-3.jpg" width="800"/></figure>
-<figure class="frame" style="grid-column:5 / span 5"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/alazar-s-cowboy-fit-full-body-portriats-4.jpg" width="800"/></figure>
-<figure class="frame shift-s" style="grid-column:10 / span 3"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/christi-s-fashion-shoot-4x5-s-14.jpg" width="800"/></figure>
+<figure class="frame shift-m" style="grid-column:1 / span 4"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/amirah-s-final-edits-3.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:5 / span 5"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/alazar-s-cowboy-fit-full-body-portriats-4.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:10 / span 3"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/christi-s-fashion-shoot-4x5-s-14.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame" style="grid-column:2 / span 5"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/fashion/aaliyah-b-day-finals-3.jpg" width="800"/></figure>
-<figure class="frame shift-m" style="grid-column:8 / span 4"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/alazar-s-cowboy-fit-retouches-3.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:2 / span 5"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/fashion/aaliyah-b-day-finals-3.jpg" width="800"/></figure>
+<figure class="frame shift-m" style="grid-column:8 / span 4"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/alazar-s-cowboy-fit-retouches-3.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame shift-s" style="grid-column:1 / span 4"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/amirah-s-final-edits-8.jpg" width="800"/></figure>
-<figure class="frame" style="grid-column:5 / span 4"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/christi-s-fashion-shoot-4x5-s-07.jpg" width="800"/></figure>
-<figure class="frame shift-m" style="grid-column:10 / span 3"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/fashion/aaliyah-b-day-final.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:1 / span 4"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/amirah-s-final-edits-8.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:5 / span 4"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/christi-s-fashion-shoot-4x5-s-07.jpg" width="800"/></figure>
+<figure class="frame shift-m" style="grid-column:10 / span 3"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/fashion/aaliyah-b-day-final.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame" style="grid-column:2 / span 4"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/alazar-s-cowboy-fit-retouches-1.jpg" width="800"/></figure>
-<figure class="frame shift-s" style="grid-column:7 / span 5"><img alt="Fashion editorial photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/christi-s-fashion-shoot-4x5-s-06.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:2 / span 4"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/alazar-s-cowboy-fit-retouches-1.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:7 / span 5"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/christi-s-fashion-shoot-4x5-s-06.jpg" width="800"/></figure>
 </div>
 </section>
 <section class="work-section" id="portraits">
 <div class="section-head"><div class="section-number">02</div><h2>Portraits</h2></div>
 <div class="art-row">
-<figure class="frame" style="grid-column:1 / span 7"><img alt="Portrait by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/portraits/alazar-tennis-4.jpg" width="800"/></figure>
-<figure class="frame shift-s" style="grid-column:9 / span 4"><img alt="Portrait by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/portraits/anthony-s-athletic-finals-3.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:1 / span 7"><img alt="Portrait by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/portraits/alazar-tennis-4.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:9 / span 4"><img alt="Portrait by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/portraits/anthony-s-athletic-finals-3.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame shift-m" style="grid-column:1 / span 4"><img alt="Portrait by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/portraits/eman-final-2.jpg" width="800"/></figure>
-<figure class="frame" style="grid-column:5 / span 5"><img alt="Portrait by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/portraits/king-portriats-4x5-s-2.jpg" width="800"/></figure>
-<figure class="frame shift-s" style="grid-column:10 / span 3"><img alt="Portrait by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/portraits/alazar-tennis-2.jpg" width="800"/></figure>
+<figure class="frame shift-m" style="grid-column:1 / span 4"><img alt="Portrait by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/portraits/eman-final-2.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:5 / span 5"><img alt="Portrait by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/portraits/king-portriats-4x5-s-2.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:10 / span 3"><img alt="Portrait by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/portraits/alazar-tennis-2.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame" style="grid-column:2 / span 5"><img alt="Portrait by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/portraits/anthony-s-athletic-finals-6.jpg" width="800"/></figure>
-<figure class="frame shift-m" style="grid-column:8 / span 4"><img alt="Portrait by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/portraits/eman-insta-finals-3.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:2 / span 5"><img alt="Portrait by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/portraits/anthony-s-athletic-finals-6.jpg" width="800"/></figure>
+<figure class="frame shift-m" style="grid-column:8 / span 4"><img alt="Portrait by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/portraits/eman-insta-finals-3.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame" style="grid-column:5 / span 4"><img alt="Portrait by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/portraits/king-portriats-4x5-s-1.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:5 / span 4"><img alt="Portrait by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/portraits/king-portriats-4x5-s-1.jpg" width="800"/></figure>
 </div>
 </section>
 <section class="work-section" id="maternity">
 <div class="section-head"><div class="section-number">03</div><h2>Maternity</h2></div>
 <div class="art-row">
-<figure class="frame" style="grid-column:1 / span 7"><img alt="Maternity photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-5.jpg" width="800"/></figure>
-<figure class="frame shift-s" style="grid-column:9 / span 4"><img alt="Maternity photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-3.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:1 / span 7"><img alt="Maternity photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-5.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:9 / span 4"><img alt="Maternity photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-3.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame shift-m" style="grid-column:1 / span 4"><img alt="Maternity photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-1.jpg" width="800"/></figure>
-<figure class="frame" style="grid-column:5 / span 5"><img alt="Maternity photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-4.jpg" width="800"/></figure>
-<figure class="frame shift-s" style="grid-column:10 / span 3"><img alt="Maternity photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-7.jpg" width="800"/></figure>
+<figure class="frame shift-m" style="grid-column:1 / span 4"><img alt="Maternity photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-1.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:5 / span 5"><img alt="Maternity photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-4.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:10 / span 3"><img alt="Maternity photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/maternity/devo-s-maternity-finals-7.jpg" width="800"/></figure>
 </div>
 </section>
 <section class="work-section" id="milestones">
 <div class="section-head"><div class="section-number">04</div><h2>Milestones</h2></div>
 <div class="art-row">
-<figure class="frame" style="grid-column:1 / span 7"><img alt="Milestone photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/milestones/logan-hayden-2.jpg" width="800"/></figure>
-<figure class="frame shift-s" style="grid-column:9 / span 4"><img alt="Milestone photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-093.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:1 / span 7"><img alt="Milestone photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/milestones/logan-hayden-2.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:9 / span 4"><img alt="Milestone photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-093.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame shift-m" style="grid-column:1 / span 4"><img alt="Milestone photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/diatou-grad-poster-final-v2.jpg" width="800"/></figure>
-<figure class="frame" style="grid-column:5 / span 5"><img alt="Milestone photograph by JAF Visuals" draggable="false" height="1000" loading="lazy" src="assets/images/milestones/dad-mom-and-rome-5.jpg" width="800"/></figure>
-<figure class="frame shift-s" style="grid-column:10 / span 3"><img alt="Milestone photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-008.jpg" width="800"/></figure>
+<figure class="frame shift-m" style="grid-column:1 / span 4"><img alt="Milestone photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/diatou-grad-poster-final-v2.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:5 / span 5"><img alt="Milestone photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/milestones/dad-mom-and-rome-5.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:10 / span 3"><img alt="Milestone photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-008.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame" style="grid-column:2 / span 5"><img alt="Milestone photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-011.jpg" width="800"/></figure>
-<figure class="frame shift-m" style="grid-column:8 / span 4"><img alt="Milestone photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-035.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:2 / span 5"><img alt="Milestone photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-011.jpg" width="800"/></figure>
+<figure class="frame shift-m" style="grid-column:8 / span 4"><img alt="Milestone photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-035.jpg" width="800"/></figure>
 </div>
 <div class="art-row">
-<figure class="frame shift-s" style="grid-column:1 / span 4"><img alt="Milestone photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-054.jpg" width="800"/></figure>
-<figure class="frame" style="grid-column:6 / span 5"><img alt="Milestone photograph by JAF Visuals" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-086.jpg" width="800"/></figure>
+<figure class="frame shift-s" style="grid-column:1 / span 4"><img alt="Milestone photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-054.jpg" width="800"/></figure>
+<figure class="frame" style="grid-column:6 / span 5"><img alt="Milestone photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/milestones/peprah-engagement-086.jpg" width="800"/></figure>
 </div>
 </section>
 <section class="about" id="about">
@@ -315,7 +369,7 @@ body.lightbox-open{overflow:hidden}
 <div class="about-copy">
 <p>Nashville-based photographer making people-focused images with a fashion-first eye.</p>
 <div class="about-links">
-<a href="mailto:hello@jafvisuals.com">hello@jafvisuals.com</a>
+<a href="mailto:jaf.visual@gmail.com">jaf.visual@gmail.com</a>
 <a href="https://www.instagram.com/jaf.visual/" target="_blank" rel="noopener noreferrer">Instagram</a>
 </div>
 </div>
@@ -372,7 +426,7 @@ body.lightbox-open{overflow:hidden}
 </section>
 </main>
 <footer>
-<span class="footer-brand"><span aria-hidden="true">© 2026</span><img alt="JAF Visuals" draggable="false" height="101" src="assets/images/brand/jaf-visuals-dark.png" width="636"/></span>
+<span class="footer-brand"><span aria-hidden="true">© 2026</span><img alt="JAFVISUAL" draggable="false" height="101" src="assets/images/brand/jaf-visuals-dark.png" width="636"/></span>
 <span>Photography</span>
 <span>Nashville, Tennessee</span>
 </footer>
@@ -581,7 +635,7 @@ const BOOKING_CONFIG = {
       window.Calendly.initInlineWidget(options);
     } catch (error) {
       console.error('Calendar failed to render:', error);
-      shell.innerHTML = '<p class="cal-placeholder">The calendar couldn’t load. Email hello@jafvisuals.com and we’ll sort a time out with you.</p>';
+      shell.innerHTML = '<p class="cal-placeholder">The calendar couldn’t load. Email jaf.visual@gmail.com and we’ll sort a time out with you.</p>';
     }
   }
 
@@ -737,7 +791,7 @@ const BOOKING_CONFIG = {
     }
 
     if(!emailjsReady()){
-      setStatus('This form isn’t connected yet. Email hello@jafvisuals.com in the meantime.', true);
+      setStatus('This form isn’t connected yet. Email jaf.visual@gmail.com in the meantime.', true);
       return;
     }
 
@@ -784,7 +838,7 @@ const BOOKING_CONFIG = {
     } catch (error) {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Send the brief';
-      setStatus('That didn’t send. Please try again, or email hello@jafvisuals.com directly.', true);
+      setStatus('That didn’t send. Please try again, or email jaf.visual@gmail.com directly.', true);
       console.error('Booking form submission failed:', error);
       return;
     }

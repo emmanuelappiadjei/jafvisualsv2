@@ -1,4 +1,4 @@
-# JAF Visuals — Portfolio Site
+# JAFVISUAL — Portfolio Site
 
 A single-page photography portfolio. No build tools, no dependencies —
 just `index.html` plus an `assets/` folder of images.
@@ -34,9 +34,9 @@ server or install needed.
 
 ## Things to customize before going live
 
-- **Name/brand** — search `index.html` for "JAF Visuals" and replace with
+- **Name/brand** — search `index.html` for "JAFVISUAL" and replace with
   the real name/logo text (appears in the header, masthead, and footer).
-- **Contact info** — replace `hello@jafvisuals.com` and `Nashville, Tennessee`
+- **Contact info** — replace `jaf.visual@gmail.com` and `Nashville, Tennessee`
   (appears in the masthead and footer).
 - **Bio** — the paragraph in the `<section class="about">` block is
   placeholder text. Swap in the real bio.
