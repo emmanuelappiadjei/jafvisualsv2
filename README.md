@@ -36,7 +36,7 @@ server or install needed.
 
 - **Name/brand** — search `index.html` for "JAF Visuals" and replace with
   the real name/logo text (appears in the header, masthead, and footer).
-- **Contact info** — replace `hello@jafvisuals.com` and `Columbus, Ohio`
+- **Contact info** — replace `hello@jafvisuals.com` and `Nashville, Tennessee`
   (appears in the masthead and footer).
 - **Bio** — the paragraph in the `<section class="about">` block is
   placeholder text. Swap in the real bio.
@@ -139,7 +139,7 @@ can't be reused from anywhere else.
 ### Calendly setup — already done
 
 The booking page is live at
-**https://calendly.com/mtanner877/photo-session** (90 minutes, Columbus area),
+**https://calendly.com/mtanner877/photo-session** (90 minutes, Nashville area),
 and `calendlyUrl` in `index.html` already points at it. Nothing to paste.
 
 Things you may want to change, all in Calendly itself — the site picks them up
