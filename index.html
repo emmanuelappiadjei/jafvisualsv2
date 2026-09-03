@@ -129,9 +129,8 @@ footer span:last-child{justify-self:end}
 .booking-head{display:grid;grid-template-columns:70px 1fr;align-items:end;padding-bottom:clamp(34px,4.4vw,66px)}
 .booking-head h2{margin:0;font-size:clamp(58px,7.6vw,122px);font-weight:700;line-height:.76;letter-spacing:-.055em}
 .booking-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gap) var(--gap);row-gap:clamp(40px,5vw,86px)}
-.booking-rail{grid-column:1/5;border-top:1px solid var(--line);padding-top:12px}
+.booking-rail{grid-column:1/5;border-top:1px solid var(--line);padding-top:12px;align-self:start;position:sticky;top:78px}
 .booking-body{grid-column:5/13}
-.booking-step{margin:0 0 10px;font-size:15px;letter-spacing:.14em;text-transform:uppercase}
 .booking-rail h3{margin:0 0 14px;font-size:clamp(32px,3.4vw,52px);font-weight:700;line-height:.84;letter-spacing:-.035em}
 .booking-note{margin:0;font-size:clamp(19px,1.35vw,23px);line-height:1.12;max-width:34ch}
 .booking-ref{margin:18px 0 0;font-size:19px;line-height:1.15;border-top:1px solid var(--line);padding-top:10px}
@@ -161,10 +160,6 @@ footer span:last-child{justify-self:end}
 .field-error{display:block;margin-top:5px;font-size:17px;color:#b00020;line-height:1.1}
 .botcheck{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-.booking-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:6px}
-.booking-submit{font-family:var(--hand);font-weight:600;font-size:clamp(22px,1.9vw,30px);line-height:1;background:#080808;color:#fff;border:1px solid #080808;border-radius:0;padding:14px 36px;cursor:pointer;transition:background .18s ease,color .18s ease}
-.booking-submit:hover:not(:disabled){background:#fff;color:#080808}
-.booking-submit:disabled{opacity:.45;cursor:default}
 .booking-status{margin:0;font-size:20px;line-height:1.12;max-width:38ch}
 .booking-status.is-error{color:#b00020}
 
@@ -173,6 +168,15 @@ footer span:last-child{justify-self:end}
 .booking-sent h4{margin:0 0 8px;font-size:clamp(26px,2.4vw,36px);font-weight:700;line-height:.9;letter-spacing:-.03em}
 .booking-sent p{margin:0;font-size:20px;line-height:1.14}
 
+.field-time{margin-top:clamp(28px,3vw,42px)}
+.time-hint{margin:0 0 12px;font-size:19px;line-height:1.15;color:#444;max-width:60ch}
+/* The locked note and the calendar are never both wanted, so they swap rather
+   than one floating over the other — an overlay had nothing to size against
+   while the shell was still empty, and spilled out of its own border. */
+.cal-lock{display:grid;place-items:center;min-height:200px;padding:clamp(26px,4vw,54px);background:#fff;border:1px solid var(--line);text-align:center}
+.cal-lock p{margin:0;font-size:clamp(20px,1.7vw,26px);line-height:1.2;max-width:28ch;color:#555}
+.cal-wrap:not(.is-open) .cal-shell{display:none}
+.cal-wrap.is-open .cal-lock{display:none}
 .cal-shell{border:1px solid var(--line);background:#fff;overflow:hidden}
 /* Calendly sizes its iframe from this box, so the height must be a real
    length — a percentage against the shell's auto height collapses it.
@@ -183,18 +187,16 @@ footer span:last-child{justify-self:end}
 @media(max-width:900px){
   .booking-head{grid-template-columns:54px 1fr}
   .booking-rail,.booking-body{grid-column:1/13}
-  .booking-rail{margin-bottom:-14px}
+  .booking-rail{margin-bottom:-14px;position:static}
 }
 @media(max-width:680px){
   .booking{padding-left:14px;padding-right:14px}
   .booking-head{grid-template-columns:38px 1fr;padding-bottom:28px}
   .booking-head h2{font-size:16vw}
   .field-row{grid-template-columns:1fr;gap:0}
-  .booking-submit{width:100%}
   .booking-status{max-width:none}
   #cal-shell .cal-mount{height:1120px}
 }
-@media(prefers-reduced-motion:reduce){.booking-submit{transition:none}}
 
 .intro[hidden]{display:none}
 .intro{position:fixed;inset:0;z-index:300;background:#050505;display:grid;place-items:center;padding:clamp(24px,7vw,90px);opacity:1;transition:opacity .55s ease}
@@ -378,14 +380,14 @@ body.lightbox-open{overflow:hidden}
 <div class="booking-head"><div class="section-number">05</div><h2>Booking</h2></div>
 <div class="booking-grid">
 <div class="booking-rail">
-<p class="booking-step">Step 01</p>
-<h3>The brief</h3>
-<p class="booking-note">Tell us who you are and what you have in mind. Every enquiry is read by us, not a bot.</p>
+<h3>Book a shoot</h3>
+<p class="booking-note">Tell us what you have in mind and pick your time — it all goes in one go. Every enquiry is read by us, not a bot.</p>
+<p class="booking-ref" hidden="" id="booking-ref"></p>
 </div>
 <div class="booking-body">
 <div class="booking-sent" hidden="" id="booking-sent" role="status">
-<h4>Brief received.</h4>
-<p>Now pick a time below — your details are already filled in. We'll confirm by email once you've chosen a slot.</p>
+<h4>You're booked in.</h4>
+<p>Your time is held and the brief is with us. There's a confirmation in your inbox with everything on it, including a link to move the shoot if you need to.</p>
 </div>
 <form class="booking-form" id="booking-form" novalidate="">
 <div class="field-row">
@@ -407,20 +409,17 @@ body.lightbox-open{overflow:hidden}
 </select></span></p>
 <p class="field"><label for="bf-desc">Shoot description</label><textarea id="bf-desc" name="description" placeholder="Location, mood, how many people, what it's for, anything you're picturing…" required="" rows="5"></textarea></p>
 <input aria-hidden="true" autocomplete="off" class="botcheck" name="botcheck" tabindex="-1" type="checkbox"/>
-<div class="booking-actions">
-<button class="booking-submit" id="booking-submit" type="submit">Send the brief</button>
+
+<div class="field field-time">
+<span class="field-legend">Your time</span>
+<p class="time-hint" id="time-hint">Everything listed is free to take — booked times drop off the list, so if you can see it, it’s yours. Shown in your own timezone.</p>
+<div class="cal-wrap" id="cal-wrap">
+<div class="cal-shell" id="cal-shell"></div>
+<div class="cal-lock" id="cal-lock" aria-live="polite"><p>Fill in your details above and the available times will open up here.</p></div>
+</div>
 <p aria-live="polite" class="booking-status" id="booking-status"></p>
 </div>
 </form>
-</div>
-<div class="booking-rail">
-<p class="booking-step">Step 02</p>
-<h3>Pick a time</h3>
-<p class="booking-note">Everything listed is free to take — booked times drop off the list, so if you can see it, it’s yours. Shown in your own timezone.</p>
-<p class="booking-ref" hidden="" id="booking-ref"></p>
-</div>
-<div class="booking-body">
-<div class="cal-shell" id="cal-shell"><p class="cal-placeholder">Loading available times…</p></div>
 </div>
 </div>
 </section>
@@ -553,7 +552,7 @@ const BOOKING_CONFIG = {
   if(!form) return;
 
   const statusEl = document.getElementById('booking-status');
-  const submitBtn = document.getElementById('booking-submit');
+  const calWrap = document.getElementById('cal-wrap');
   const sentEl = document.getElementById('booking-sent');
   const refEl = document.getElementById('booking-ref');
   const shell = document.getElementById('cal-shell');
@@ -643,8 +642,9 @@ const BOOKING_CONFIG = {
   // portfolio stays as dependency-free as the rest of the page.
   const section = document.getElementById('booking');
   function warmUp(){
-    renderCalendly(null);
-    if(emailjsReady()) readyEmailJs().catch(() => {}); // retried on submit
+    // The embed isn't drawn here: it waits until the brief is complete, so the
+    // two halves read as one form rather than a calendar sitting open beside it.
+    if(emailjsReady()) readyEmailJs().catch(() => {}); // retried when it's needed
   }
   if(section && 'IntersectionObserver' in window){
     const observer = new IntersectionObserver((entries, obs) => {
@@ -693,17 +693,20 @@ const BOOKING_CONFIG = {
   }
   const focusTarget = (el) => el.dataset.radioGroup ? el.querySelector('input') : el;
 
+  // One source of truth: validate() paints these, briefComplete() checks them
+  // silently to decide when the times open.
+  const rules = [
+    ['bf-name',    (v) => v.length >= 2,                           'Please tell us your name.'],
+    ['bf-phone',   (v) => v.replace(/\D/g, '').length >= 7,        'Please add a number we can reach you on.'],
+    ['bf-email',   (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v), 'Please check the email address.'],
+    ['bf-contact', (v) => v !== '',                                'Phone or email — whichever you prefer.'],
+    ['bf-type',    (v) => v !== '',                                'Pick the kind of shoot.'],
+    ['bf-desc',    (v) => v.length >= 10,                          'A sentence or two about the shoot, please.']
+  ];
+
   function validate(){
-    const checks = [
-      ['bf-name',    (v) => v.length >= 2,                           'Please tell us your name.'],
-      ['bf-phone',   (v) => v.replace(/\D/g, '').length >= 7,        'Please add a number we can reach you on.'],
-      ['bf-email',   (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v), 'Please check the email address.'],
-      ['bf-contact', (v) => v !== '',                                'Phone or email — whichever you prefer.'],
-      ['bf-type',    (v) => v !== '',                                'Pick the kind of shoot.'],
-      ['bf-desc',    (v) => v.length >= 10,                          'A sentence or two about the shoot, please.']
-    ];
     let firstBad = null;
-    checks.forEach(([id, test, message]) => {
+    rules.forEach(([id, test, message]) => {
       const el = document.getElementById(id);
       if(!el) return;
       if(test(valueOf(el))){
@@ -717,17 +720,77 @@ const BOOKING_CONFIG = {
   }
 
   form.querySelectorAll('input, select, textarea').forEach(input => {
-    const revalidate = () => {
+    const onEdit = () => {
       const field = fieldOf(input);
       if(field && field.classList.contains('invalid')) validate();
+      openTimesWhenReady();
     };
-    input.addEventListener('input', revalidate);
-    input.addEventListener('change', revalidate);
+    input.addEventListener('input', onEdit);
+    input.addEventListener('change', onEdit);
   });
 
-  /* ---------- Submit ---------- */
-  // Short human-quotable code so an EmailJS notification and a Cal.com booking
-  // can be matched to each other — the two services share no state.
+  /* ---------- Opening the times ---------- */
+  // Booking is one act here: the visitor describes the shoot and picks a slot
+  // without a submit in between. So the embed stays shut until the brief is
+  // complete — that way a booking can never arrive with nothing attached to it.
+  let timesOpen = false;
+  let slotChosen = false;
+  let lastPrefill = '';
+  let prefillTimer = null;
+
+  function briefValues(){
+    return {
+      name: document.getElementById('bf-name').value.trim(),
+      phone: document.getElementById('bf-phone').value.trim(),
+      email: document.getElementById('bf-email').value.trim(),
+      shootType: document.getElementById('bf-type').value,
+      description: document.getElementById('bf-desc').value.trim(),
+      preferredContact: valueOf(document.getElementById('bf-contact'))
+    };
+  }
+
+  // Quiet counterpart to validate(): same rules, but it never paints an error,
+  // because nobody should be scolded for a form they're still halfway through.
+  function briefComplete(){
+    return rules.every(([id, test]) => test(valueOf(document.getElementById(id))));
+  }
+
+  function prefillFor(values){
+    return {
+      name: values.name,
+      email: values.email,
+      notes: values.shootType + ' — ' + values.description
+    };
+  }
+
+  function openTimesWhenReady(){
+    if(!briefComplete()) return;
+    const values = briefValues();
+    const signature = values.name + '|' + values.email + '|' + values.shootType + '|' + values.description;
+
+    if(!timesOpen){
+      timesOpen = true;
+      lastPrefill = signature;
+      calWrap.classList.add('is-open');
+      renderCalendly(prefillFor(values));
+      return;
+    }
+
+    // Already open. Only rebuild if what Calendly was handed has actually
+    // changed, and never once a slot is being picked — yanking the embed out
+    // mid-booking would lose their place.
+    if(signature === lastPrefill || slotChosen) return;
+    clearTimeout(prefillTimer);
+    prefillTimer = setTimeout(() => {
+      if(slotChosen) return;
+      lastPrefill = signature;
+      renderCalendly(prefillFor(briefValues()));
+    }, 1200);
+  }
+
+  /* ---------- Sending ---------- */
+  // Short human-quotable code so the EmailJS brief and the Calendly booking can
+  // be matched to each other — the two services share no state.
   function makeReference(){
     const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let out = '';
@@ -747,74 +810,46 @@ const BOOKING_CONFIG = {
     statusEl.classList.toggle('is-error', !!isError);
   }
 
-  function showBooked(values, reference){
+  function showBooked(reference){
     form.hidden = true;
     if(sentEl) sentEl.hidden = false;
     if(refEl){
       refEl.hidden = false;
-      refEl.innerHTML = 'Your reference: <b>' + reference + '</b><br/>Quote it in the booking notes if you need to change anything.';
+      refEl.innerHTML = 'Your reference: <b>' + reference + '</b><br/>Quote it if you need to change anything.';
     }
-    // renderCalendly swallows its own failures, so a calendar that won't draw
-    // can never make a received enquiry look lost.
-    renderCalendly({
-      name: values.name,
-      email: values.email,
-      notes: values.shootType + ' — ' + values.description + ' (ref ' + reference + ')'
-    });
     if(sentEl) sentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
+  let sending = false;
+  async function sendBrief(){
+    if(sending) return;
+    sending = true;
 
-    const firstBad = validate();
-    if(firstBad){
-      setStatus('', false);
-      firstBad.focus({ preventScroll: false });
-      return;
-    }
-
-    const values = {
-      name: document.getElementById('bf-name').value.trim(),
-      phone: document.getElementById('bf-phone').value.trim(),
-      email: document.getElementById('bf-email').value.trim(),
-      shootType: document.getElementById('bf-type').value,
-      preferredContact: valueOf(document.getElementById('bf-contact')),
-      description: document.getElementById('bf-desc').value.trim()
-    };
+    const values = briefValues();
     const reference = makeReference();
 
-    // Honeypot: a real person never ticks this. Look successful, send nothing.
-    if(form.querySelector('[name="botcheck"]').checked){
-      showBooked(values, reference);
-      return;
-    }
+    // A real person never ticks this. Look normal, send nothing.
+    if(form.querySelector('[name="botcheck"]').checked){ showBooked(reference); return; }
 
     if(!emailjsReady()){
-      setStatus('This form isn’t connected yet. Email jaf.visual@gmail.com in the meantime.', true);
+      setStatus('Your time is booked. We couldn’t attach the brief automatically — email jaf.visual@gmail.com and we’ll add it.', true);
       return;
     }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending…';
-    setStatus('', false);
 
     const params = {
       reference: reference,
       name: values.name,
       phone: values.phone,
-      email: values.email,           // auto-reply template addresses {{email}}
-      preferred_contact: values.preferredContact,
+      email: values.email,           // the auto-reply template addresses {{email}}
       shoot_type: values.shootType,
       description: values.description,
+      preferred_contact: values.preferredContact,
       submitted: new Date().toLocaleString()
     };
 
     try {
       await readyEmailJs();
 
-      // 1. Notify the studio. Recipients normally come from the template's
-      //    "To Email"; notifyEmails overrides that, one send per address.
       const recipients = Array.isArray(BOOKING_CONFIG.notifyEmails) ? BOOKING_CONFIG.notifyEmails : [];
       if(recipients.length){
         for(const to of recipients){
@@ -825,27 +860,51 @@ const BOOKING_CONFIG = {
         await emailjs.send(BOOKING_CONFIG.emailjsServiceId, BOOKING_CONFIG.emailjsNotifyTemplate, params);
       }
 
-      // 2. Auto-reply to the client. Deliberately after the notification and
-      //    non-fatal: a failed confirmation must not lose us the enquiry.
+      // Deliberately after the notification and non-fatal: a failed
+      // confirmation must not cost us the enquiry.
       if(!isPlaceholder(BOOKING_CONFIG.emailjsReplyTemplate)){
         try {
           await emailjs.send(BOOKING_CONFIG.emailjsServiceId, BOOKING_CONFIG.emailjsReplyTemplate, params);
         } catch (replyError) {
-          console.warn('Booking auto-reply failed (enquiry was still received):', replyError);
+          console.warn('Booking auto-reply failed (the enquiry still arrived):', replyError);
         }
       }
-
     } catch (error) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Send the brief';
-      setStatus('That didn’t send. Please try again, or email jaf.visual@gmail.com directly.', true);
-      console.error('Booking form submission failed:', error);
-      return;
+      // The slot is already held by Calendly at this point, so this is never a
+      // dead end — say what's missing rather than implying the booking failed.
+      console.error('Booking brief failed to send:', error);
+      setStatus('Your time is booked, but the brief didn’t reach us. Please email jaf.visual@gmail.com so we know what you’re after.', true);
     }
 
-    // Only reached once the notification is genuinely away, and deliberately
-    // outside the try: nothing the confirmation UI does can retract that.
-    showBooked(values, reference);
+    showBooked(reference);
+  }
+
+  // Calendly talks to the page by postMessage. event_scheduled is the moment the
+  // slot is actually held, which is what stands in for a submit button here.
+  // Match the host exactly, not a substring: "evil-calendly.com.example" would
+  // sail through a naive indexOf and let anyone fire a booking.
+  function fromCalendly(origin){
+    try {
+      const host = new URL(origin).hostname;
+      return host === 'calendly.com' || host.endsWith('.calendly.com');
+    } catch (error) {
+      return false;
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    if(!event.data || typeof event.data.event !== 'string') return;
+    if(!fromCalendly(event.origin)) return;
+    if(event.data.event === 'calendly.date_and_time_selected') slotChosen = true;
+    if(event.data.event === 'calendly.event_scheduled') sendBrief();
+  });
+
+  // Nothing submits this form directly; Enter shouldn't look like it did.
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const firstBad = validate();
+    if(firstBad) firstBad.focus({ preventScroll: false });
+    else openTimesWhenReady();
   });
 })();
 </script>
