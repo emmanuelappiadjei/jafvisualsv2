@@ -9,7 +9,7 @@ just `index.html` plus an `assets/` folder of images.
 index.html
 assets/
   images/
-    fashion/       20 images shown in the Fashion & Editorial section
+    fashion/       20 images shown in the Fashion/Editorial section
     portraits/     11 images shown in the Portraits section
     maternity/      5 images shown in the Maternity section
     milestones/    11 images shown in the Milestones section
