@@ -380,13 +380,13 @@ body.lightbox-open{overflow:hidden}
 <div class="booking-grid">
 <div class="booking-rail">
 <h3>Book a shoot</h3>
-<p class="booking-note">Tell us what you have in mind and pick your time — it all goes in one go. Every enquiry is read by us, not a bot.</p>
+<p class="booking-note">Tell me what you have in mind and pick your time — it all goes in one go. Every enquiry is read by me, not a bot.</p>
 <p class="booking-ref" hidden="" id="booking-ref"></p>
 </div>
 <div class="booking-body">
 <div class="booking-sent" hidden="" id="booking-sent" role="status">
 <h4>You're booked in.</h4>
-<p>Your time is held and the brief is with us. There's a confirmation in your inbox with everything on it, including a link to move the shoot if you need to.</p>
+<p>Your time is held and the brief is with me. There's a confirmation in your inbox with everything on it, including a link to move the shoot if you need to.</p>
 </div>
 <form class="booking-form" id="booking-form" novalidate="">
 <div class="field-row">
@@ -407,13 +407,14 @@ body.lightbox-open{overflow:hidden}
 <option value="Family Portrait Session">Family Portrait Session — 1 hr · $100</option>
 <option value="Business Profile Photoshoot Session">Business Profile Photoshoot Session — 1 hr · $60</option>
 <option value="Graduation Photoshoot Session">Graduation Photoshoot Session — 1 hr · $80</option>
+<option value="Something else">Something else — describe it below</option>
 </select></span></p>
 <p class="field"><label for="bf-desc">Shoot description</label><textarea id="bf-desc" name="description" placeholder="Location, mood, how many people, what it's for, anything you're picturing…" required="" rows="5"></textarea></p>
 <input aria-hidden="true" autocomplete="off" class="botcheck" name="botcheck" tabindex="-1" type="checkbox"/>
 
 <div class="field field-time">
 <span class="field-legend">Your time</span>
-<p class="time-hint" id="time-hint">Everything listed is free to take — booked times drop off the list, so if you can see it, it’s yours. Shown in your own timezone.</p>
+<p class="time-hint" id="time-hint">Pick how long you need, then a time. Everything listed is free to take — booked times drop off the list, so if you can see it, it’s yours. Shown in your own timezone.</p>
 <div class="cal-wrap" id="cal-wrap">
 <div class="cal-shell" id="cal-shell"></div>
 <div class="cal-lock" id="cal-lock" aria-live="polite"><p>Fill in your details above and the available times will open up here.</p></div>
@@ -605,7 +606,7 @@ const BOOKING_CONFIG = {
   async function renderCalendly(prefill){
     if(!shell) return;
     if(isPlaceholder(BOOKING_CONFIG.calendlyUrl)){
-      shell.innerHTML = '<p class="cal-placeholder">The availability calendar isn’t connected yet — set <code>calendlyUrl</code> in index.html. Send the brief above and we’ll reply with times.</p>';
+      shell.innerHTML = '<p class="cal-placeholder">The availability calendar isn’t connected yet — set <code>calendlyUrl</code> in index.html. Send the brief above and I’ll reply with times.</p>';
       return;
     }
 
@@ -635,7 +636,7 @@ const BOOKING_CONFIG = {
       window.Calendly.initInlineWidget(options);
     } catch (error) {
       console.error('Calendar failed to render:', error);
-      shell.innerHTML = '<p class="cal-placeholder">The calendar couldn’t load. Email jaf.visual@gmail.com and we’ll sort a time out with you.</p>';
+      shell.innerHTML = '<p class="cal-placeholder">The calendar couldn’t load. Email jaf.visual@gmail.com and I’ll sort a time out with you.</p>';
     }
   }
 
@@ -697,8 +698,8 @@ const BOOKING_CONFIG = {
   // One source of truth: validate() paints these, briefComplete() checks them
   // silently to decide when the times open.
   const rules = [
-    ['bf-name',    (v) => v.length >= 2,                           'Please tell us your name.'],
-    ['bf-phone',   (v) => v.replace(/\D/g, '').length >= 7,        'Please add a number we can reach you on.'],
+    ['bf-name',    (v) => v.length >= 2,                           'Please tell me your name.'],
+    ['bf-phone',   (v) => v.replace(/\D/g, '').length >= 7,        'Please add a number I can reach you on.'],
     ['bf-email',   (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v), 'Please check the email address.'],
     ['bf-contact', (v) => v !== '',                                'Phone or email — whichever you prefer.'],
     ['bf-type',    (v) => v !== '',                                'Pick the kind of shoot.'],
@@ -833,7 +834,7 @@ const BOOKING_CONFIG = {
     if(form.querySelector('[name="botcheck"]').checked){ showBooked(reference); return; }
 
     if(!emailjsReady()){
-      setStatus('Your time is booked. We couldn’t attach the brief automatically — email jaf.visual@gmail.com and we’ll add it.', true);
+      setStatus('Your time is booked. I couldn’t attach the brief automatically — email jaf.visual@gmail.com and I’ll add it.', true);
       return;
     }
 
@@ -874,7 +875,7 @@ const BOOKING_CONFIG = {
       // The slot is already held by Calendly at this point, so this is never a
       // dead end — say what's missing rather than implying the booking failed.
       console.error('Booking brief failed to send:', error);
-      setStatus('Your time is booked, but the brief didn’t reach us. Please email jaf.visual@gmail.com so we know what you’re after.', true);
+      setStatus('Your time is booked, but the brief didn’t reach me. Please email jaf.visual@gmail.com so I know what you’re after.', true);
     }
 
     showBooked(reference);
