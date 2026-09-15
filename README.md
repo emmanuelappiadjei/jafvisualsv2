@@ -14,7 +14,7 @@ assets/
     maternity/      5 images shown in the Maternity section
     milestones/    11 images shown in the Milestones section
     features/      the 5 large "hero" images (masthead + one per section)
-    about-placeholder.jpg
+    jesse-the-one-4x5.jpg   the About portrait
 ```
 
 ## Viewing it locally
@@ -40,11 +40,12 @@ server or install needed.
   (appears in the masthead and footer).
 - **Bio** — the paragraph in the `<section class="about">` block is
   placeholder text. Swap in the real bio.
-- **About photo** — replace `assets/images/about-placeholder.jpg` with an
-  actual headshot (keep the same filename, or update the `src` in
-  `index.html` if you rename it).
+- **About photo** — `assets/images/jesse-the-one-4x5.jpg`. Swap the file
+  keeping that name, or rename it and update the `src` in `index.html`.
+  Avoid spaces and capitals in image filenames — they need escaping in a
+  URL and break in some places that a plain lowercase name does not.
 - **Booking form** — paste your EmailJS keys into `BOOKING_CONFIG` in
-  `index.html`. The Calendly link is already set (see "Booking form setup").
+  `index.html`. The Cal.com link is already set (see "Booking form setup").
 - **Instagram link** — currently a dead `#` link in the About section and
   nowhere else; add the real URL.
 
@@ -55,24 +56,24 @@ two-step flow:
 
 1. **The brief** — a custom form (name, phone, email, shoot type, shoot
    description) that sends through **EmailJS**.
-2. **Pick a time** — an inline **Calendly** embed showing your real
+2. **Pick a time** — an inline **Cal.com** embed showing your real
    availability. Open slots are selectable; anything already booked disappears,
-   because Calendly reads your connected calendar.
+   because Cal.com reads your connected calendar.
 
 One submission sends **two** emails via EmailJS:
 
 - a **new booking notification** to you and your friend, and
 - a **custom auto-reply** to whoever filled the form.
 
-Calendly owns the calendar and prevents double-booking. Since the two services
+Cal.com owns the calendar and prevents double-booking. Since the two services
 share no state, each submission mints a reference code (e.g. `JAF-84V5C`) that
-appears in your notification email *and* is pre-filled into the Calendly booking
+appears in your notification email *and* is pre-filled into the Cal.com booking
 notes, so a brief can be matched to the slot it belongs to.
 
 ### Already connected
 
 `BOOKING_CONFIG` at the top of the last `<script>` in `index.html` is filled
-in and live — the EmailJS account, both templates and the Calendly link are
+in and live — the EmailJS account, both templates and the Cal.com link are
 all wired up. Nothing to paste.
 
 Those ids are public by design: they ship in the page for the browser to use.
@@ -87,7 +88,7 @@ const BOOKING_CONFIG = {
   emailjsServiceId:      'service_m3ctnna',
   emailjsNotifyTemplate: 'template_9w638jz',   // to the studio
   emailjsReplyTemplate:  'template_72hr605',   // to the client
-  calendlyUrl:           'https://calendly.com/mtanner877/photo-session',
+  calLink:           'https://cal.com/YOUR-LINK',
   ...
 };
 ```
@@ -136,28 +137,28 @@ for any no-backend form, and true of every alternative too). In **Account →
 Security**, turn on the domain allowlist and add your live domain so the key
 can't be reused from anywhere else.
 
-### Calendly setup — already done
+### Cal.com setup — already done
 
 The booking page is live at
-**https://calendly.com/mtanner877/photo-session** (90 minutes, Nashville area),
-and `calendlyUrl` in `index.html` already points at it. Nothing to paste.
+**https://cal.com/YOUR-LINK** (90 minutes, Nashville area),
+and `calLink` in `index.html` already points at it. Nothing to paste.
 
-Things you may want to change, all in Calendly itself — the site picks them up
+Things you may want to change, all in Cal.com itself — the site picks them up
 automatically, no code edit needed:
 
 - **Your hours.** Availability defaults to 9:00–17:00 every day, Sunday
   included. Set your real shooting hours under **Availability**.
 - **Connect your Google Calendar** so anything already in your diary blocks
-  those slots off. Until you do, Calendly only knows about Calendly bookings.
+  those slots off. Until you do, Cal.com only knows about Cal.com bookings.
 - **Session length** is 90 minutes. Change it on the event type if your shoots
   run longer or shorter.
 - **Your link name.** The URL says `mtanner877` because that's the account
   username. Changing it to something like `jafvisuals` under **Account →
   Link** makes the booking page look like yours — if you do, update
-  `calendlyUrl` in `index.html` to match, or the calendar will 404.
+  `calLink` in `index.html` to match, or the calendar will 404.
 
-Only change `calendlyUrl` if you rename the event or move bookings to a
-different Calendly account.
+Only change `calLink` if you rename the event or move bookings to a
+different Cal.com account.
 
 ### If mail stops arriving
 
@@ -178,16 +179,16 @@ EmailJS free allows **200 requests/month** and 2 templates. Each booking costs
 you use the `notifyEmails` fallback above with two addresses, each booking
 costs 3 requests instead (~66/month).
 
-Calendly's free plan allows **one** event type and unlimited bookings, which
-is exactly what this uses. Calendly's own confirmation email to the client is
+Cal.com's free plan allows **one** event type and unlimited bookings, which
+is exactly what this uses. Cal.com's own confirmation email to the client is
 free and separate from the EmailJS auto-reply.
 
 ### Notes
 
-- Both third-party scripts (EmailJS and Calendly) are **lazy-loaded** — they
+- Both third-party scripts (EmailJS and Cal.com) are **lazy-loaded** — they
   only download when a visitor scrolls near the booking section, so browsing
   the portfolio stays as dependency-free as the rest of the site.
-- If Calendly fails to load, the section shows a fallback message pointing at
+- If Cal.com fails to load, the section shows a fallback message pointing at
   your email rather than an empty box.
 - Until the values are pasted in, the form and calendar show a "not connected
   yet" message rather than failing silently.

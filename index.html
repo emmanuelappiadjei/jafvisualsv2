@@ -44,7 +44,7 @@ img{display:block;width:100%;height:auto;filter:none!important;opacity:1!importa
 .hero figure{margin:0;overflow:hidden;background:#f4f4f1}
 .hero > figure img{aspect-ratio:4/5;object-fit:contain;background:#fff}
 
-.category-strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);margin-bottom:clamp(82px,10vw,150px)}
+.category-strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);margin-bottom:clamp(22px,2.8vw,44px)}
 .category-strip a{min-width:0;padding:18px var(--pad) 20px;border-right:1px solid var(--line);display:flex;gap:12px;align-items:baseline;font-size:clamp(22px,2.2vw,36px);line-height:.92}
 .category-strip a:last-child{border-right:0}
 .category-strip span{font-size:14px;letter-spacing:.08em}
@@ -52,6 +52,7 @@ img{display:block;width:100%;height:auto;filter:none!important;opacity:1!importa
 
 .work-section{padding:0 var(--pad) clamp(100px,13vw,210px);scroll-margin-top:58px}
 .section-head{display:grid;grid-template-columns:70px 1fr;align-items:end;border-top:1px solid var(--line);padding:14px 0 clamp(34px,4vw,64px)}
+#fashion .section-head{border-top:0;padding-top:0}
 .section-number{font-size:18px;letter-spacing:.08em;padding-bottom:8px}
 .section-head h2{margin:0;font-size:clamp(58px,7.6vw,122px);font-weight:700;line-height:.76;letter-spacing:-.055em}
 
@@ -104,7 +105,7 @@ footer span:last-child{justify-self:end}
   .hero-brand img{width:min(78vw,380px);height:auto;max-width:100%;max-height:86px;object-fit:contain;object-position:center center;margin:auto}
   .hero figure{background:#fff;aspect-ratio:4/5}
   .hero > figure img{width:100%;height:100%;aspect-ratio:auto;object-fit:cover;background:transparent}
-  .category-strip{margin-bottom:90px}
+  .category-strip{margin-bottom:26px}
   .category-strip a{padding:15px 14px 17px;font-size:25px}
   .work-section{padding-left:14px;padding-right:14px;padding-bottom:110px}
   .section-head{grid-template-columns:38px 1fr;padding-bottom:28px}
@@ -167,6 +168,8 @@ footer span:last-child{justify-self:end}
 .booking-sent[hidden]{display:none}
 .booking-sent h4{margin:0 0 8px;font-size:clamp(26px,2.4vw,36px);font-weight:700;line-height:.9;letter-spacing:-.03em}
 .booking-sent p{margin:0;font-size:20px;line-height:1.14}
+.booking-when{font-size:clamp(23px,2vw,30px)!important;font-weight:600;line-height:1.05!important;margin-bottom:10px!important}
+.booking-when[hidden]{display:none}
 
 .field-time{margin-top:clamp(28px,3vw,42px)}
 .time-hint{margin:0 0 12px;font-size:19px;line-height:1.15;color:#444;max-width:60ch}
@@ -178,9 +181,9 @@ footer span:last-child{justify-self:end}
 .cal-wrap:not(.is-open) .cal-shell{display:none}
 .cal-wrap.is-open .cal-lock{display:none}
 .cal-shell{border:1px solid var(--line);background:#fff;overflow:hidden}
-/* Calendly sizes its iframe from this box, so the height must be a real
+/* The embed sizes its iframe from this box, so the height must be a real
    length — a percentage against the shell's auto height collapses it.
-   Scoped to #cal-shell to outrank anything in Calendly's own stylesheet. */
+   Scoped to #cal-shell to outrank anything in the vendor's own stylesheet. */
 #cal-shell .cal-mount{display:block;width:100%;min-width:320px;height:780px}
 .cal-placeholder{margin:0;padding:clamp(24px,3vw,40px);font-size:20px;line-height:1.2;color:#555}
 
@@ -366,9 +369,10 @@ body.lightbox-open{overflow:hidden}
 </section>
 <section class="about" id="about">
 <h2 class="about-title">About</h2>
-<figure class="about-photo"><img alt="Photographer portrait placeholder" draggable="false" height="1125" loading="lazy" src="assets/images/about-placeholder.jpg" width="900"/></figure>
+<figure class="about-photo"><img alt="Portrait of the photographer behind JAFVISUAL" draggable="false" height="1350" loading="lazy" src="assets/images/jesse-the-one-4x5.jpg" width="1080"/></figure>
 <div class="about-copy">
 <p>Nashville-based photographer making people-focused images with a fashion-first eye.</p>
+<p>Mainly focusing on Portrait Photography and Music/Lifestyle Videography, JAFVISUAL is bringing a new perspective to these topics in the city of Nashville and eventually the WORLD!</p>
 <div class="about-links">
 <a href="mailto:jaf.visual@gmail.com">jaf.visual@gmail.com</a>
 <a href="https://www.instagram.com/jaf.visual/" target="_blank" rel="noopener noreferrer">Instagram</a>
@@ -380,12 +384,13 @@ body.lightbox-open{overflow:hidden}
 <div class="booking-grid">
 <div class="booking-rail">
 <h3>Book a shoot</h3>
-<p class="booking-note">Tell me what you have in mind and pick your time — it all goes in one go. Every enquiry is read by me, not a bot.</p>
+<p class="booking-note">Tell me what you have in mind and pick your time — it all goes in one go. Every inquiry is read by me, not a bot.</p>
 <p class="booking-ref" hidden="" id="booking-ref"></p>
 </div>
 <div class="booking-body">
 <div class="booking-sent" hidden="" id="booking-sent" role="status">
 <h4>You're booked in.</h4>
+<p class="booking-when" hidden="" id="booking-when"></p>
 <p>Your time is held and the brief is with me. There's a confirmation in your inbox with everything on it, including a link to move the shoot if you need to.</p>
 </div>
 <form class="booking-form" id="booking-form" novalidate="">
@@ -517,7 +522,7 @@ body.lightbox-open{overflow:hidden}
 /* ============================================================
    BOOKING — configuration.  Already live; nothing to fill in.
 
-   These EmailJS ids and the Calendly link are public by design — they ship
+   These EmailJS ids and the booking link are public by design — they ship
    in the page for the browser to use, and none of them can read your data
    or send anything the templates don't already allow.
 
@@ -538,14 +543,15 @@ const BOOKING_CONFIG = {
   // anything you put here is public in this repo.
   notifyEmails: [],
 
-  // --- Calendly -----------------------------------------------------------
-  // The full public link to your booking page. Change this if you rename the
-  // event or switch which account takes bookings.
-  calendlyUrl: 'https://calendly.com/mtanner877/photo-session',
+  // --- Cal.com ------------------------------------------------------------
+  // Your booking link WITHOUT the domain: a page at
+  // https://cal.com/jafvisual/photo-session is 'jafvisual/photo-session'.
+  // Session lengths are set on the event type itself, not here.
+  calLink: 'jafvisual/photo-session',
 
   // Leave these alone.
-  calendlyWidgetJs: 'https://assets.calendly.com/assets/external/widget.js',
-  calendlyWidgetCss: 'https://assets.calendly.com/assets/external/widget.css',
+  calOrigin: 'https://cal.com',
+  calEmbedJs: 'https://app.cal.com/embed/embed.js',
   emailjsSdk: 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js'
 };
 
@@ -588,55 +594,116 @@ const BOOKING_CONFIG = {
     }
   }
 
-  /* ---------- Calendly inline embed ---------- */
-  let calendlyInstance = 0;
+  /* ---------- Cal.com inline embed ---------- */
+  let calInstance = 0;
+  let loaderInjected = false;
 
-  function ensureCalendlyCss(){
-    if(document.getElementById('calendly-widget-css')) return;
-    const link = document.createElement('link');
-    link.id = 'calendly-widget-css';
-    link.rel = 'stylesheet';
-    link.href = BOOKING_CONFIG.calendlyWidgetCss;
-    document.head.appendChild(link);
+  function injectCalLoader(){
+    if(loaderInjected) return;
+    loaderInjected = true;
+    (function (C, A, L) {
+      const p = function (a, ar) { a.q.push(ar); };
+      const d = C.document;
+      C.Cal = C.Cal || function () {
+        const cal = C.Cal;
+        const ar = arguments;
+        if(!cal.loaded){
+          cal.ns = {};
+          cal.q = cal.q || [];
+          d.head.appendChild(d.createElement('script')).src = A;
+          cal.loaded = true;
+        }
+        if(ar[0] === L){
+          const api = function () { p(api, arguments); };
+          const namespace = ar[1];
+          api.q = api.q || [];
+          if(typeof namespace === 'string'){
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            p(cal.ns[namespace], ar);
+            p(cal, ['initNamespace', namespace]);
+          } else {
+            p(cal, ar);
+          }
+          return;
+        }
+        p(cal, ar);
+      };
+    })(window, BOOKING_CONFIG.calEmbedJs, 'init');
   }
 
   // Never throws: a calendar that fails to draw must not take anything else
-  // down with it. Calling it again tears the old widget out and rebuilds it,
-  // which is how the post-submit prefill gets applied.
-  async function renderCalendly(prefill){
+  // down with it. Calling it again tears the old embed out and rebuilds it
+  // under a fresh namespace, which is how the prefill gets applied.
+  async function renderCalendar(prefill){
     if(!shell) return;
-    if(isPlaceholder(BOOKING_CONFIG.calendlyUrl)){
-      shell.innerHTML = '<p class="cal-placeholder">The availability calendar isn’t connected yet — set <code>calendlyUrl</code> in index.html. Send the brief above and I’ll reply with times.</p>';
+    if(isPlaceholder(BOOKING_CONFIG.calLink)){
+      shell.innerHTML = '<p class="cal-placeholder">The availability calendar isn\u2019t connected yet \u2014 set <code>calLink</code> in index.html. Send the brief above and I\u2019ll reply with times.</p>';
       return;
     }
 
     try {
-      ensureCalendlyCss();
-      await loadScript(BOOKING_CONFIG.calendlyWidgetJs);
+      injectCalLoader();
+      calInstance += 1;
+      const ns = 'jafBooking' + calInstance;
+      const mountId = 'cal-mount-' + calInstance;
 
-      calendlyInstance += 1;
       shell.textContent = '';
       const mount = document.createElement('div');
-      mount.id = 'calendly-mount-' + calendlyInstance;
+      mount.id = mountId;
       mount.className = 'cal-mount';
       shell.appendChild(mount);
 
-      const url = BOOKING_CONFIG.calendlyUrl
-        + (BOOKING_CONFIG.calendlyUrl.indexOf('?') > -1 ? '&' : '?')
-        + 'hide_gdpr_banner=1';
-
-      const options = { url: url, parentElement: mount };
+      const config = { layout: 'month_view' };
       if(prefill){
-        options.prefill = {};
-        if(prefill.name)  options.prefill.name  = prefill.name;
-        if(prefill.email) options.prefill.email = prefill.email;
-        // a1 is Calendly's first custom question on the event type.
-        if(prefill.notes) options.prefill.customAnswers = { a1: prefill.notes };
+        if(prefill.name)  config.name  = prefill.name;
+        if(prefill.email) config.email = prefill.email;
+        if(prefill.notes) config.notes = prefill.notes;
       }
-      window.Calendly.initInlineWidget(options);
+
+      Cal('init', ns, { origin: BOOKING_CONFIG.calOrigin });
+      Cal.ns[ns]('inline', { elementOrSelector: '#' + mountId, calLink: BOOKING_CONFIG.calLink, config: config });
+      Cal.ns[ns]('ui', {
+        layout: 'month_view',
+        hideEventTypeDetails: false,
+        cssVarsPerTheme: { light: { 'cal-brand': '#080808' }, dark: { 'cal-brand': '#ffffff' } }
+      });
+
+      // Cal.com hands the booking back to the page, so unlike the old embed the
+      // date and time are actually available to put in the email.
+      Cal.ns[ns]('on', { action: 'bookingSuccessful', callback: (event) => {
+        sendBrief(readBookingTime(event));
+      }});
+      Cal.ns[ns]('on', { action: 'bookingSuccessfulV2', callback: (event) => {
+        sendBrief(readBookingTime(event));
+      }});
     } catch (error) {
       console.error('Calendar failed to render:', error);
-      shell.innerHTML = '<p class="cal-placeholder">The calendar couldn’t load. Email jaf.visual@gmail.com and I’ll sort a time out with you.</p>';
+      shell.innerHTML = '<p class="cal-placeholder">The calendar couldn\u2019t load. Email jaf.visual@gmail.com and I\u2019ll sort a time out with you.</p>';
+    }
+  }
+
+  // The payload shape has moved between embed versions, so dig rather than
+  // assume one path, and fall back to an empty string instead of printing
+  // "undefined" into somebody's confirmation email.
+  function readBookingTime(event){
+    try {
+      const data = (event && event.detail && event.detail.data) || (event && event.data) || {};
+      const booking = data.booking || data;
+      const start = booking.startTime
+        || (booking.date && booking.date.startTime)
+        || (Array.isArray(booking.allBookings) && booking.allBookings[0] && booking.allBookings[0].startTime)
+        || data.startTime
+        || '';
+      if(!start) return '';
+      const when = new Date(start);
+      if(isNaN(when.getTime())) return '';
+      return when.toLocaleString(undefined, {
+        weekday: 'long', day: 'numeric', month: 'long',
+        hour: 'numeric', minute: '2-digit'
+      });
+    } catch (error) {
+      console.warn('Could not read the booking time from the calendar:', error);
+      return '';
     }
   }
 
@@ -736,9 +803,6 @@ const BOOKING_CONFIG = {
   // without a submit in between. So the embed stays shut until the brief is
   // complete — that way a booking can never arrive with nothing attached to it.
   let timesOpen = false;
-  let slotChosen = false;
-  let lastPrefill = '';
-  let prefillTimer = null;
 
   function briefValues(){
     return {
@@ -766,32 +830,19 @@ const BOOKING_CONFIG = {
   }
 
   function openTimesWhenReady(){
-    if(!briefComplete()) return;
-    const values = briefValues();
-    const signature = values.name + '|' + values.email + '|' + values.shootType + '|' + values.description;
-
-    if(!timesOpen){
-      timesOpen = true;
-      lastPrefill = signature;
-      calWrap.classList.add('is-open');
-      renderCalendly(prefillFor(values));
-      return;
-    }
-
-    // Already open. Only rebuild if what Calendly was handed has actually
-    // changed, and never once a slot is being picked — yanking the embed out
-    // mid-booking would lose their place.
-    if(signature === lastPrefill || slotChosen) return;
-    clearTimeout(prefillTimer);
-    prefillTimer = setTimeout(() => {
-      if(slotChosen) return;
-      lastPrefill = signature;
-      renderCalendly(prefillFor(briefValues()));
-    }, 1200);
+    if(timesOpen || !briefComplete()) return;
+    timesOpen = true;
+    calWrap.classList.add('is-open');
+    renderCalendar(prefillFor(briefValues()));
   }
 
+  // The embed is drawn once and then left alone. Later edits to the brief are
+  // not pushed into it: rebuilding the iframe to refresh a prefill would throw
+  // away a half-finished booking, and the email is built from the live fields
+  // at send time regardless, so nothing is actually lost by leaving it be.
+
   /* ---------- Sending ---------- */
-  // Short human-quotable code so the EmailJS brief and the Calendly booking can
+  // Short human-quotable code so the EmailJS brief and the calendar booking can
   // be matched to each other — the two services share no state.
   function makeReference(){
     const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -812,9 +863,14 @@ const BOOKING_CONFIG = {
     statusEl.classList.toggle('is-error', !!isError);
   }
 
-  function showBooked(reference){
+  function showBooked(reference, whenText){
     form.hidden = true;
     if(sentEl) sentEl.hidden = false;
+    const whenEl = document.getElementById('booking-when');
+    if(whenEl && whenText){
+      whenEl.hidden = false;
+      whenEl.textContent = whenText;
+    }
     if(refEl){
       refEl.hidden = false;
       refEl.innerHTML = 'Your reference: <b>' + reference + '</b><br/>Quote it if you need to change anything.';
@@ -823,15 +879,16 @@ const BOOKING_CONFIG = {
   }
 
   let sending = false;
-  async function sendBrief(){
+  async function sendBrief(whenText){
     if(sending) return;
     sending = true;
 
     const values = briefValues();
     const reference = makeReference();
+    const when = whenText || '';
 
     // A real person never ticks this. Look normal, send nothing.
-    if(form.querySelector('[name="botcheck"]').checked){ showBooked(reference); return; }
+    if(form.querySelector('[name="botcheck"]').checked){ showBooked(reference, when); return; }
 
     if(!emailjsReady()){
       setStatus('Your time is booked. I couldn’t attach the brief automatically — email jaf.visual@gmail.com and I’ll add it.', true);
@@ -846,6 +903,7 @@ const BOOKING_CONFIG = {
       shoot_type: values.shootType,
       description: values.description,
       preferred_contact: values.preferredContact,
+      when: when,
       submitted: new Date().toLocaleString()
     };
 
@@ -863,43 +921,23 @@ const BOOKING_CONFIG = {
       }
 
       // Deliberately after the notification and non-fatal: a failed
-      // confirmation must not cost us the enquiry.
+      // confirmation must not cost the inquiry.
       if(!isPlaceholder(BOOKING_CONFIG.emailjsReplyTemplate)){
         try {
           await emailjs.send(BOOKING_CONFIG.emailjsServiceId, BOOKING_CONFIG.emailjsReplyTemplate, params);
         } catch (replyError) {
-          console.warn('Booking auto-reply failed (the enquiry still arrived):', replyError);
+          console.warn('Booking auto-reply failed (the inquiry still arrived):', replyError);
         }
       }
     } catch (error) {
-      // The slot is already held by Calendly at this point, so this is never a
+      // The slot is already held by the calendar at this point, so this is never a
       // dead end — say what's missing rather than implying the booking failed.
       console.error('Booking brief failed to send:', error);
       setStatus('Your time is booked, but the brief didn’t reach me. Please email jaf.visual@gmail.com so I know what you’re after.', true);
     }
 
-    showBooked(reference);
+    showBooked(reference, when);
   }
-
-  // Calendly talks to the page by postMessage. event_scheduled is the moment the
-  // slot is actually held, which is what stands in for a submit button here.
-  // Match the host exactly, not a substring: "evil-calendly.com.example" would
-  // sail through a naive indexOf and let anyone fire a booking.
-  function fromCalendly(origin){
-    try {
-      const host = new URL(origin).hostname;
-      return host === 'calendly.com' || host.endsWith('.calendly.com');
-    } catch (error) {
-      return false;
-    }
-  }
-
-  window.addEventListener('message', (event) => {
-    if(!event.data || typeof event.data.event !== 'string') return;
-    if(!fromCalendly(event.origin)) return;
-    if(event.data.event === 'calendly.date_and_time_selected') slotChosen = true;
-    if(event.data.event === 'calendly.event_scheduled') sendBrief();
-  });
 
   // Nothing submits this form directly; Enter shouldn't look like it did.
   form.addEventListener('submit', (event) => {
