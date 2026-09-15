@@ -847,17 +847,11 @@ const BOOKING_CONFIG = {
     return { name: values.name, email: values.email, notes: note };
   }
 
-  // Refreshing the prefill means rebuilding the iframe, which would wipe a
-  // half-finished booking. A cross-origin iframe takes focus away from the
-  // parent document when it is clicked, and that is the one reliable signal
-  // we get that someone has started using the calendar — after it, the embed
-  // is left alone whatever the brief does.
-  let calEngaged = false;
-  window.addEventListener('blur', () => {
-    const active = document.activeElement;
-    if(active && active.tagName === 'IFRAME' && shell && shell.contains(active)) calEngaged = true;
-  });
-
+  // An earlier version stopped refreshing once the calendar had been clicked,
+  // to protect a half-finished booking. In practice people look at the times,
+  // scroll back up to correct something, and return — and that guard left the
+  // calendar holding details the visitor had already changed, which is the
+  // worse failure. It refreshes whenever the brief actually differs now.
   function signatureOf(values){
     return [values.name, values.email, values.shootType, values.description].join('\u0000');
   }
@@ -875,18 +869,20 @@ const BOOKING_CONFIG = {
       return;
     }
 
-    if(calEngaged) return;
+    // Once it's sending or sent, the brief is already on its way; rebuilding
+    // then would only disturb the confirmation.
+    if(sending) return;
     const signature = signatureOf(values);
     if(signature === lastPrefill) return;
 
     // Wait for a pause in typing: rebuilding per keystroke would flicker.
     clearTimeout(prefillTimer);
     prefillTimer = setTimeout(() => {
-      if(calEngaged) return;
+      if(sending) return;
       const latest = briefValues();
       lastPrefill = signatureOf(latest);
       renderCalendar(prefillFor(latest));
-    }, 800);
+    }, 700);
   }
 
   /* ---------- Sending ---------- */
