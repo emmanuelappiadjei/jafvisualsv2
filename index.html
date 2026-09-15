@@ -770,7 +770,7 @@ const BOOKING_CONFIG = {
     ['bf-email',   (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v), 'Please check the email address.'],
     ['bf-contact', (v) => v !== '',                                'Phone or email — whichever you prefer.'],
     ['bf-type',    (v) => v !== '',                                'Pick the kind of shoot.'],
-    ['bf-desc',    (v) => v.length >= 10,                          'A sentence or two about the shoot, please.']
+    ['bf-desc',    (v) => v !== '',                                'Tell me a little about the shoot.']
   ];
 
   function validate(){
