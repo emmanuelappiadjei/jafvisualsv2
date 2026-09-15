@@ -14,7 +14,7 @@ assets/
     maternity/      5 images shown in the Maternity section
     milestones/    11 images shown in the Milestones section
     features/      the 5 large "hero" images (masthead + one per section)
-    about-placeholder.jpg
+    jesse-the-one-4x5.jpg   the About portrait
 ```
 
 ## Viewing it locally
@@ -40,9 +40,10 @@ server or install needed.
   (appears in the masthead and footer).
 - **Bio** — the paragraph in the `<section class="about">` block is
   placeholder text. Swap in the real bio.
-- **About photo** — replace `assets/images/about-placeholder.jpg` with an
-  actual headshot (keep the same filename, or update the `src` in
-  `index.html` if you rename it).
+- **About photo** — `assets/images/jesse-the-one-4x5.jpg`. Swap the file
+  keeping that name, or rename it and update the `src` in `index.html`.
+  Avoid spaces and capitals in image filenames — they need escaping in a
+  URL and break in some places that a plain lowercase name does not.
 - **Booking form** — paste your EmailJS keys into `BOOKING_CONFIG` in
   `index.html`. The Cal.com link is already set (see "Booking form setup").
 - **Instagram link** — currently a dead `#` link in the About section and
