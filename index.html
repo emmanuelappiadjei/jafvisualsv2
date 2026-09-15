@@ -173,6 +173,7 @@ footer span:last-child{justify-self:end}
 
 .field-time{margin-top:clamp(28px,3vw,42px)}
 .time-hint{margin:0 0 12px;font-size:19px;line-height:1.15;color:#444;max-width:60ch}
+.field-hint{display:block;margin:-2px 0 8px;font-size:18px;line-height:1.15;color:#555;max-width:58ch}
 /* The locked note and the calendar are never both wanted, so they swap rather
    than one floating over the other — an overlay had nothing to size against
    while the shell was still empty, and spilled out of its own border. */
@@ -286,13 +287,13 @@ body.lightbox-open{overflow:hidden}
 <figure><img alt="Fashion portrait by JAFVISUAL" draggable="false" fetchpriority="high" height="1000" src="assets/images/fashion/alazar-s-cowboy-fit-close-up-portriats-5.jpg" width="800"/></figure>
 </section>
 <nav aria-label="Portfolio categories" class="category-strip">
-<a href="#fashion"><span>01</span>Fashion/Editorial</a>
+<a href="#fashion"><span>01</span>Fashion/<wbr/>Editorial</a>
 <a href="#portraits"><span>02</span>Portraits</a>
 <a href="#maternity"><span>03</span>Maternity</a>
 <a href="#milestones"><span>04</span>Milestones</a>
 </nav>
 <section class="work-section" id="fashion">
-<div class="section-head"><div class="section-number">01</div><h2>Fashion/Editorial</h2></div>
+<div class="section-head"><div class="section-number">01</div><h2>Fashion/<wbr/>Editorial</h2></div>
 <div class="art-row">
 <figure class="frame" style="grid-column:1 / span 7"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1000" loading="lazy" src="assets/images/fashion/aliyah-s-birthday-shoot-4x5-s-08.jpg" width="800"/></figure>
 <figure class="frame shift-s" style="grid-column:9 / span 4"><img alt="Fashion editorial photograph by JAFVISUAL" draggable="false" height="1066" loading="lazy" src="assets/images/fashion/aaliyah-b-day-finals-10.jpg" width="800"/></figure>
@@ -414,7 +415,7 @@ body.lightbox-open{overflow:hidden}
 <option value="Graduation Photoshoot Session">Graduation Photoshoot Session — 1 hr · $80</option>
 <option value="Something else">Something else — describe it below</option>
 </select></span></p>
-<p class="field"><label for="bf-desc">Shoot description</label><textarea id="bf-desc" name="description" placeholder="Location, mood, how many people, what it's for, anything you're picturing…" required="" rows="5"></textarea></p>
+<p class="field"><label for="bf-desc">Shoot description</label><span class="field-hint" id="bf-desc-hint">The more you tell me the better — there's no such thing as too much detail here.</span><textarea aria-describedby="bf-desc-hint" id="bf-desc" name="description" placeholder="What you're picturing, who's in it, where you'd like to shoot, what it's for…" required="" rows="5"></textarea></p>
 <input aria-hidden="true" autocomplete="off" class="botcheck" name="botcheck" tabindex="-1" type="checkbox"/>
 
 <div class="field field-time">
