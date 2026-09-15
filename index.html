@@ -690,8 +690,14 @@ const BOOKING_CONFIG = {
     try {
       const data = (event && event.detail && event.detail.data) || (event && event.data) || {};
       const booking = data.booking || data;
+      // `date` is documented as a string but has been an object in some
+      // versions, so accept either rather than betting on one.
+      const fromDate = typeof booking.date === 'string'
+        ? booking.date
+        : (booking.date && booking.date.startTime) || '';
       const start = booking.startTime
-        || (booking.date && booking.date.startTime)
+        || fromDate
+        || (typeof data.date === 'string' ? data.date : '')
         || (Array.isArray(booking.allBookings) && booking.allBookings[0] && booking.allBookings[0].startTime)
         || data.startTime
         || '';
@@ -804,6 +810,10 @@ const BOOKING_CONFIG = {
   // without a submit in between. So the embed stays shut until the brief is
   // complete — that way a booking can never arrive with nothing attached to it.
   let timesOpen = false;
+  let lastPrefill = '';
+  let prefillTimer = null;
+  // Minted once per visit so the calendar note and the emails agree.
+  let bookingRef = '';
 
   function briefValues(){
     return {
@@ -822,25 +832,62 @@ const BOOKING_CONFIG = {
     return rules.every(([id, test]) => test(valueOf(document.getElementById(id))));
   }
 
+  // Cal.com carries prefill in the booking URL, so a long brief produces an
+  // over-long URL and comes out truncated mid-sentence. Send a summary it can
+  // hold intact and say where the rest is — the email always has the full text.
+  const NOTE_LIMIT = 140;
   function prefillFor(values){
-    return {
-      name: values.name,
-      email: values.email,
-      notes: values.shootType + ' — ' + values.description
-    };
+    let note = values.shootType + ' · ref ' + bookingRef;
+    const brief = values.description;
+    if(brief){
+      note += ' — ' + (brief.length > NOTE_LIMIT
+        ? brief.slice(0, NOTE_LIMIT).trimEnd() + '… (full brief emailed)'
+        : brief);
+    }
+    return { name: values.name, email: values.email, notes: note };
+  }
+
+  // Refreshing the prefill means rebuilding the iframe, which would wipe a
+  // half-finished booking. A cross-origin iframe takes focus away from the
+  // parent document when it is clicked, and that is the one reliable signal
+  // we get that someone has started using the calendar — after it, the embed
+  // is left alone whatever the brief does.
+  let calEngaged = false;
+  window.addEventListener('blur', () => {
+    const active = document.activeElement;
+    if(active && active.tagName === 'IFRAME' && shell && shell.contains(active)) calEngaged = true;
+  });
+
+  function signatureOf(values){
+    return [values.name, values.email, values.shootType, values.description].join('\u0000');
   }
 
   function openTimesWhenReady(){
-    if(timesOpen || !briefComplete()) return;
-    timesOpen = true;
-    calWrap.classList.add('is-open');
-    renderCalendar(prefillFor(briefValues()));
-  }
+    if(!briefComplete()) return;
+    if(!bookingRef) bookingRef = makeReference();
+    const values = briefValues();
 
-  // The embed is drawn once and then left alone. Later edits to the brief are
-  // not pushed into it: rebuilding the iframe to refresh a prefill would throw
-  // away a half-finished booking, and the email is built from the live fields
-  // at send time regardless, so nothing is actually lost by leaving it be.
+    if(!timesOpen){
+      timesOpen = true;
+      lastPrefill = signatureOf(values);
+      calWrap.classList.add('is-open');
+      renderCalendar(prefillFor(values));
+      return;
+    }
+
+    if(calEngaged) return;
+    const signature = signatureOf(values);
+    if(signature === lastPrefill) return;
+
+    // Wait for a pause in typing: rebuilding per keystroke would flicker.
+    clearTimeout(prefillTimer);
+    prefillTimer = setTimeout(() => {
+      if(calEngaged) return;
+      const latest = briefValues();
+      lastPrefill = signatureOf(latest);
+      renderCalendar(prefillFor(latest));
+    }, 800);
+  }
 
   /* ---------- Sending ---------- */
   // Short human-quotable code so the EmailJS brief and the calendar booking can
@@ -885,7 +932,7 @@ const BOOKING_CONFIG = {
     sending = true;
 
     const values = briefValues();
-    const reference = makeReference();
+    const reference = bookingRef || makeReference();
     const when = whenText || '';
 
     // A real person never ticks this. Look normal, send nothing.
