@@ -91,14 +91,21 @@ footer span:last-child{justify-self:end}
 }
 
 @media(max-width:680px){
-  .header-inner{height:54px}
+  /* Four links will not fit beside the wordmark at this width, and hiding
+     two of them took Work and Contact off the phone entirely. Give the nav
+     its own full-width row under a hairline instead — everything fits, and
+     nothing has to shrink into illegibility. */
+  html{scroll-padding-top:86px}
+  .header-inner{height:auto;padding:0;gap:0;flex-wrap:wrap;align-items:center}
+  .wordmark{padding:10px var(--pad) 9px}
   .wordmark img{width:clamp(112px,34vw,138px)}
-  .nav{font-size:17px;gap:13px}
-  /* No room for four items beside the wordmark. Work is reachable by
-     scrolling, and Booking now carries the contact intent, so the mailto
-     goes rather than shrinking everything into illegibility. */
-  .nav a:first-child,.nav a[href^="mailto:"]{display:none}
-  .nav-cta{padding:7px 13px}
+  .nav{order:3;flex:1 0 100%;justify-content:space-between;
+       border-top:1px solid var(--line);padding:1px var(--pad);
+       font-size:18px;gap:10px}
+  /* Thumbs, not cursors: pad the links out to a tappable height. */
+  .nav a:not(.nav-cta){padding:10px 2px}
+  .nav a::after{bottom:6px}
+  .nav-cta{padding:10px 15px}
   .hero{grid-template-columns:1fr 1fr;padding-left:0;padding-right:0;gap:1px;background:#111}
   .hero-brand{grid-column:1/3;min-height:118px;justify-content:center;align-items:center;padding:18px var(--pad)}
   .hero-brand picture{inset:0;padding:16px var(--pad);justify-content:center;align-items:center}
