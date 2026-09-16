@@ -4,6 +4,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
+<!-- Without this, mobile Safari samples the page to tint its top and bottom
+     bars, and the sample lags: the black intro leaves black bars sitting
+     there for seconds after the curtain has lifted. Declaring the colour
+     stops the sampling; the intro script swaps it black and back. -->
+<meta content="#ffffff" name="theme-color"/>
 <meta content="JAFVISUAL — fashion, portrait, maternity and milestone photography in Nashville, Tennessee." name="description"/>
 <title>JAFVISUAL — Photography</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -19,7 +24,7 @@
   --gap:clamp(8px,1vw,16px);
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:58px}
+html{scroll-behavior:smooth;scroll-padding-top:58px;background:var(--paper)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--hand);font-weight:500;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 img{display:block;width:100%;height:auto;filter:none!important;opacity:1!important;mix-blend-mode:normal;-webkit-user-drag:none;-webkit-touch-callout:none;user-select:none}
@@ -258,7 +263,13 @@ body.lightbox-open{overflow:hidden}
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduced) return;
 
+  // Mobile browsers tint their chrome from this, instantly — unlike the colour
+  // they sample off the page themselves, which lingers long after the curtain.
+  const tint = document.querySelector('meta[name="theme-color"]');
+  const setTint = (colour) => { if(tint) tint.setAttribute('content', colour); };
+
   intro.hidden = false;
+  setTint('#050505');
   document.body.classList.add('intro-open');
 
   let finished = false;
@@ -266,6 +277,7 @@ body.lightbox-open{overflow:hidden}
     if(finished) return;
     finished = true;
     intro.classList.add('is-done');
+    setTint('#ffffff');
     document.body.classList.remove('intro-open');
     setTimeout(() => intro.remove(), 700);
   }
