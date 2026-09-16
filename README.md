@@ -84,10 +84,10 @@ stops arriving" below.
 
 ```js
 const BOOKING_CONFIG = {
-  emailjsPublicKey:      '1-uB0BPT4IGXOhuSU',
-  emailjsServiceId:      'service_m3ctnna',
-  emailjsNotifyTemplate: 'template_9w638jz',   // to the studio
-  emailjsReplyTemplate:  'template_72hr605',   // to the client
+  emailjsPublicKey:      'OTRckMOBljPXVwlsM',
+  emailjsServiceId:      'service_sujpjt5',
+  emailjsNotifyTemplate: 'template_x9qf0di',   // to the studio
+  emailjsReplyTemplate:  'template_691m6lc',   // to the client
   calLink:           'https://cal.com/YOUR-LINK',
   ...
 };
