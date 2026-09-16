@@ -85,7 +85,7 @@ stops arriving" below.
 ```js
 const BOOKING_CONFIG = {
   emailjsPublicKey:      'OTRckMOBljPXVwlsM',
-  emailjsServiceId:      'service_sujpjt5',
+  emailjsServiceId:      'service_elhbjup',
   emailjsNotifyTemplate: 'template_x9qf0di',   // to the studio
   emailjsReplyTemplate:  'template_691m6lc',   // to the client
   calLink:           'https://cal.com/YOUR-LINK',
