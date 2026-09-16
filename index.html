@@ -181,11 +181,16 @@ footer span:last-child{justify-self:end}
 .cal-lock p{margin:0;font-size:clamp(20px,1.7vw,26px);line-height:1.2;max-width:28ch;color:#555}
 .cal-wrap:not(.is-open) .cal-shell{display:none}
 .cal-wrap.is-open .cal-lock{display:none}
-.cal-shell{border:1px solid var(--line);background:#fff;overflow:hidden}
+.cal-shell{border:1px solid var(--line);background:#fff}
 /* The embed sizes its iframe from this box, so the height must be a real
    length — a percentage against the shell's auto height collapses it.
    Scoped to #cal-shell to outrank anything in the vendor's own stylesheet. */
-#cal-shell .cal-mount{display:block;width:100%;min-width:320px;height:780px}
+/* A floor, not a ceiling. Cal.com takes the height of this box and grows the
+   iframe as its own content changes — a fixed height caps that, and on a phone
+   the time list runs past it and is cut off. min-height keeps the box from
+   collapsing before the embed loads while letting it grow past that after. */
+#cal-shell .cal-mount{display:block;width:100%;min-width:320px;min-height:780px}
+#cal-shell .cal-mount iframe{display:block;width:100%;border:0;min-height:780px}
 .cal-placeholder{margin:0;padding:clamp(24px,3vw,40px);font-size:20px;line-height:1.2;color:#555}
 
 @media(max-width:900px){
@@ -199,7 +204,7 @@ footer span:last-child{justify-self:end}
   .booking-head h2{font-size:16vw}
   .field-row{grid-template-columns:1fr;gap:0}
   .booking-status{max-width:none}
-  #cal-shell .cal-mount{height:1120px}
+  #cal-shell .cal-mount,#cal-shell .cal-mount iframe{min-height:1150px}
 }
 
 .intro[hidden]{display:none}
