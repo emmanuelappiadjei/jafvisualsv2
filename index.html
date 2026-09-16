@@ -179,6 +179,11 @@ footer span:last-child{justify-self:end}
    while the shell was still empty, and spilled out of its own border. */
 .cal-lock{display:grid;place-items:center;min-height:200px;padding:clamp(26px,4vw,54px);background:#fff;border:1px solid var(--line);text-align:center}
 .cal-lock p{margin:0;font-size:clamp(20px,1.7vw,26px);line-height:1.2;max-width:28ch;color:#555}
+.cal-escape{margin:14px 0 0;font-size:18px;line-height:1.3;color:#555;max-width:62ch}
+.cal-escape[hidden]{display:none}
+.cal-escape-btn{font-family:var(--hand);font-weight:600;font-size:18px;line-height:1;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--ink);border-radius:0;padding:0 0 1px;cursor:pointer}
+.cal-escape-btn:hover:not(:disabled){background:#080808;color:#fff;border-bottom-color:#080808}
+.cal-escape-btn:disabled{opacity:.5;cursor:default}
 .cal-wrap:not(.is-open) .cal-shell{display:none}
 .cal-wrap.is-open .cal-lock{display:none}
 .cal-shell{border:1px solid var(--line);background:#fff}
@@ -430,6 +435,7 @@ body.lightbox-open{overflow:hidden}
 <div class="cal-shell" id="cal-shell"></div>
 <div class="cal-lock" id="cal-lock" aria-live="polite"><p>Fill in your details above and the available times will open up here.</p></div>
 </div>
+<p class="cal-escape" hidden="" id="cal-escape">Can't find a time that works, or the calendar isn't playing ball? <button class="cal-escape-btn" id="cal-escape-btn" type="button">Send your brief on its own</button> and I'll come back to you with times.</p>
 <p aria-live="polite" class="booking-status" id="booking-status"></p>
 </div>
 </form>
@@ -674,14 +680,15 @@ const BOOKING_CONFIG = {
         cssVarsPerTheme: { light: { 'cal-brand': '#080808' }, dark: { 'cal-brand': '#ffffff' } }
       });
 
-      // Cal.com hands the booking back to the page, so unlike the old embed the
-      // date and time are actually available to put in the email.
-      Cal.ns[ns]('on', { action: 'bookingSuccessful', callback: (event) => {
-        sendBrief(readBookingTime(event));
-      }});
-      Cal.ns[ns]('on', { action: 'bookingSuccessfulV2', callback: (event) => {
-        sendBrief(readBookingTime(event));
-      }});
+      // A booking that reaches Cal.com but never reaches this page costs a real
+      // enquiry, so subscribe every documented way rather than trusting one.
+      // The docs show Cal("on", …) on the global object; this code runs on a
+      // namespace, and it isn't clear the two are equivalent — so both.
+      ['bookingSuccessful', 'bookingSuccessfulV2'].forEach((action) => {
+        const handler = { action: action, callback: (event) => sendBrief(readBookingTime(event)) };
+        try { Cal.ns[ns]('on', handler); } catch (error) { /* namespace may not accept it */ }
+        try { Cal('on', handler); } catch (error) { /* global may not accept it */ }
+      });
     } catch (error) {
       console.error('Calendar failed to render:', error);
       shell.innerHTML = '<p class="cal-placeholder">The calendar couldn\u2019t load. Email jaf.visual@gmail.com and I\u2019ll sort a time out with you.</p>';
@@ -693,7 +700,11 @@ const BOOKING_CONFIG = {
   // "undefined" into somebody's confirmation email.
   function readBookingTime(event){
     try {
-      const data = (event && event.detail && event.detail.data) || (event && event.data) || {};
+      // Three shapes reach here: the wrapper's CustomEvent (detail.data), a raw
+      // postMessage whose payload nests the booking under .data again, and the
+      // payload itself. Unwrap until something booking-shaped appears.
+      let data = (event && event.detail && event.detail.data) || (event && event.data) || {};
+      if(data && data.data && (data.type || data.originator)) data = data.data;
       const booking = data.booking || data;
       // `date` is documented as a string but has been an object in some
       // versions, so accept either rather than betting on one.
@@ -871,6 +882,10 @@ const BOOKING_CONFIG = {
       lastPrefill = signatureOf(values);
       calWrap.classList.add('is-open');
       renderCalendar(prefillFor(values));
+      // The booking event is a third party's to fire, and if it never does the
+      // enquiry is lost without a trace. This is the way out of that.
+      const escape = document.getElementById('cal-escape');
+      if(escape) escape.hidden = false;
       return;
     }
 
@@ -914,7 +929,17 @@ const BOOKING_CONFIG = {
 
   function showBooked(reference, whenText){
     form.hidden = true;
-    if(sentEl) sentEl.hidden = false;
+    const escape = document.getElementById('cal-escape');
+    if(escape) escape.hidden = true;
+    if(sentEl){
+      sentEl.hidden = false;
+      const heading = sentEl.querySelector('h4');
+      const body = sentEl.querySelector('p:last-of-type');
+      if(!whenText && heading && body){
+        heading.textContent = 'Brief received.';
+        body.textContent = "No time is held yet — I'll reply with some that work and we'll get it in the diary.";
+      }
+    }
     const whenEl = document.getElementById('booking-when');
     if(whenEl && whenText){
       whenEl.hidden = false;
@@ -986,6 +1011,43 @@ const BOOKING_CONFIG = {
     }
 
     showBooked(reference, when);
+  }
+
+  // Everything above goes through Cal.com's own wrapper. If that wrapper fails
+  // to deliver — which is what appears to have happened — the iframe's raw
+  // message still arrives here. The shape is internal and undocumented, so
+  // this only fires on something booking-shaped from a verified cal.com
+  // origin, and sendBrief refuses to run twice regardless.
+  function fromCal(origin){
+    try {
+      const host = new URL(origin).hostname;
+      return host === 'cal.com' || host.endsWith('.cal.com');
+    } catch (error) {
+      return false;
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    if(!fromCal(event.origin) || !event.data) return;
+    let blob;
+    try { blob = typeof event.data === 'string' ? event.data : JSON.stringify(event.data); }
+    catch (error) { return; }
+    if(blob.indexOf('bookingSuccessful') === -1) return;
+    sendBrief(readBookingTime(event));
+  });
+
+  const escapeBtn = document.getElementById('cal-escape-btn');
+  if(escapeBtn){
+    escapeBtn.addEventListener('click', () => {
+      if(!briefComplete()){
+        const firstBad = validate();
+        if(firstBad) firstBad.focus({ preventScroll: false });
+        return;
+      }
+      escapeBtn.disabled = true;
+      escapeBtn.textContent = 'Sending…';
+      sendBrief('');   // no time: they haven't booked one
+    });
   }
 
   // Nothing submits this form directly; Enter shouldn't look like it did.
