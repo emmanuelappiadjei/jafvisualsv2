@@ -239,6 +239,10 @@ footer span:last-child{justify-self:end}
 .intro.is-done{opacity:0;pointer-events:none}
 html.intro-open,html.intro-open body{background:#050505}
 html.intro-open body{overflow:hidden}
+/* Nothing but the curtain paints while the curtain is up. No viewport
+   arithmetic to get wrong when the phone slides its toolbars about — there
+   is simply nothing behind the black to show through. */
+html.intro-open body > *:not(.intro){visibility:hidden}
 @media(prefers-reduced-motion:reduce){.intro,.intro img{transition:none}}
 
 .lightbox[hidden]{display:none}
